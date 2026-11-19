@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Garde neuro">
+<title>Garde neuro</title>
+<meta name="theme-color" content="#2B3AD0">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: one left-aligned column for a phone held in one hand. Home = time rail + tool list; a tool = items, with the result pinned at the bottom. */
+:root{
+  --paper:#ECEFF8; --surface:#FFFFFF; --ink:#121836; --muted:#59618A; --line:#D3D8EA;
+  --accent:#2B3AD0; --on-accent:#FFFFFF; --tint:#E1E5FB;
+  --ok:#0B7A63; --warn:#A86200; --crit:#C02A3C;
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",-apple-system,"Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0A0E23; --surface:#131937; --ink:#E8EBFA; --muted:#99A1C8; --line:#272F58;
+    --accent:#93A0FF; --on-accent:#0A0E23; --tint:#1C2450;
+    --ok:#4FD1B5; --warn:#F2B34C; --crit:#FF7D8B; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0A0E23; --surface:#131937; --ink:#E8EBFA; --muted:#99A1C8; --line:#272F58;
+  --accent:#93A0FF; --on-accent:#0A0E23; --tint:#1C2450;
+  --ok:#4FD1B5; --warn:#F2B34C; --crit:#FF7D8B; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{max-width:620px;margin:0 auto;padding:20px 16px 150px;display:flex;flex-direction:column;gap:22px}
+h1,h2{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.02em}
+h1{font-size:2.3rem;font-weight:800;line-height:1.02}
+h2{font-size:1.2rem;font-weight:700}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+
+/* Home */
+.top{display:flex;flex-direction:column;gap:4px}
+.chrono{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.chrono-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.elapsed{font-family:var(--display);font-weight:800;font-size:3.4rem;line-height:.9;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.elapsed small{font-size:1.1rem;font-weight:600;letter-spacing:0;color:var(--muted);margin-left:6px}
+.onset{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.onset input{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-height:44px}
+.ghost{background:none;border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-height:44px}
+.rail{position:relative;height:14px;border-radius:7px;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-top:6px}
+.rail i{border-radius:4px;background:var(--line)}
+.rail i.on{background:var(--accent)}
+.rail i.s1.on{background:var(--ok)} .rail i.s2.on{background:var(--warn)} .rail i.s3.on,.rail i.s4.on{background:var(--crit)}
+.cursor{position:absolute;top:-6px;width:4px;height:26px;border-radius:2px;background:var(--ink);transform:translateX(-2px)}
+.ticks{display:grid;grid-template-columns:repeat(4,1fr);font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.ticks span:last-child{display:flex;justify-content:space-between}
+.windows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.windows li{display:flex;justify-content:space-between;gap:12px;font-size:.95rem}
+.windows b{font-weight:700;text-align:right}
+.is-ok{color:var(--ok)} .is-warn{color:var(--warn)} .is-crit{color:var(--crit)}
+.search{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 14px;min-height:48px}
+.group{display:flex;flex-direction:column;gap:8px}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.list a{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;padding:13px 14px;text-decoration:none;color:inherit;border-top:1px solid var(--line)}
+.list a:first-child{border-top:0}
+.list a strong{font-weight:700}
+.list a .d{grid-column:1;font-size:.86rem;color:var(--muted)}
+.kind{grid-row:1/span 2;grid-column:2;font-size:.75rem;color:var(--accent);background:var(--tint);border-radius:999px;padding:3px 9px}
+footer{font-size:.82rem;color:var(--muted)}
+
+/* Tool */
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--accent);text-decoration:none;font-weight:600;min-height:44px}
+.back::before{content:"";width:9px;height:9px;border-left:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(45deg)}
+.tool-head{display:flex;flex-direction:column;gap:6px}
+.tool-head .line{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.items{display:flex;flex-direction:column;gap:14px}
+fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+legend{padding:0;font-weight:700;margin-bottom:6px}
+legend small,.tog small{display:block;font-weight:400;color:var(--muted);font-size:.84rem}
+.opt,.tog{display:grid;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:11px 12px;min-height:50px}
+.opt{grid-template-columns:34px 1fr}
+.tog{grid-template-columns:1fr auto}
+.opt .n,.tog .n{font-family:var(--display);font-weight:700;font-variant-numeric:tabular-nums;text-align:center;border-radius:9px;background:var(--paper);padding:4px 0;min-width:34px}
+.tog .n{padding:4px 9px}
+.opt[aria-pressed="true"],.tog[aria-pressed="true"]{border-color:var(--accent);background:var(--tint)}
+.opt[aria-pressed="true"] .n,.tog[aria-pressed="true"] .n{background:var(--accent);color:var(--on-accent)}
+.field{display:grid;grid-template-columns:1fr 130px;gap:10px;align-items:center;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:8px 12px}
+.field label{font-weight:600}
+.field label small{display:block;font-weight:400;color:var(--muted);font-size:.84rem}
+.field input,.field select{width:100%;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 10px;min-height:44px;text-align:right;font-variant-numeric:tabular-nums}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:7px}
+.card h2{font-size:1.05rem}
+.note{font-size:.88rem;color:var(--muted)}
+.out{font-size:.98rem}
+.out ul{margin:6px 0 0;padding-left:1.1em}
+
+.card a,.steps a,.note a{color:var(--accent);font-weight:600}
+.steps{list-style:none;margin:0;padding:0;counter-reset:st;display:flex;flex-direction:column;gap:12px}
+.steps>li{counter-increment:st;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.steps h2{display:flex;gap:10px;align-items:baseline;font-size:1.08rem}
+.steps h2::before{content:counter(st);font-family:var(--display);font-weight:800;font-size:1.5rem;color:var(--accent);font-variant-numeric:tabular-nums}
+.steps ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:7px}
+.branch{display:flex;flex-direction:column;gap:3px;border-left:5px solid var(--line);background:var(--paper);border-radius:0 12px 12px 0;padding:10px 12px}
+.branch.ok{border-color:var(--ok)} .branch.warn{border-color:var(--warn)} .branch.crit{border-color:var(--crit)}
+.start{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--accent);color:var(--on-accent);border-radius:16px;padding:15px 16px;text-decoration:none;font-weight:700}
+.start span{white-space:nowrap;font-weight:400;font-size:.88rem;opacity:.9}
+
+.fsec{display:flex;flex-direction:column;gap:10px}
+.q{display:flex;flex-direction:column;gap:7px}
+.ql{font-weight:600}.ql small{font-weight:400;color:var(--muted);font-size:.84rem;margin-left:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--surface);border:1.5px solid var(--line);border-radius:999px;padding:9px 14px;min-height:44px}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
+.linkrow{display:block;text-decoration:none;color:var(--accent);font-weight:600;text-align:center}
+.preview{font-family:var(--body);font-size:.88rem;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+
+.mrow{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.mrow .ql small{display:block;margin-left:0}
+.side{display:grid;grid-template-columns:22px repeat(6,1fr);gap:6px;align-items:center}
+.sl{font-family:var(--display);font-weight:700;color:var(--muted)}
+.g{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;min-height:42px;font-family:var(--display);font-weight:700;font-variant-numeric:tabular-nums;padding:0}
+.g[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+details.card summary{font-weight:700;cursor:pointer}
+
+.sub{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-left:4px solid var(--accent);padding-left:10px}
+.sub span{font-size:.92rem;font-weight:600}
+.other{width:100%;background:var(--surface);border:1.5px solid var(--accent);border-radius:12px;padding:10px 12px;min-height:46px}
+
+.dot{display:inline-block;width:11px;height:11px;border-radius:3px;background:var(--gc);margin-right:9px}
+.group .list{border-left:5px solid var(--gc)}
+.gname{font-size:.86rem;font-weight:600;color:var(--muted);display:flex;align-items:center}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.quick a{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:2px;min-height:64px}
+.quick b{font-family:var(--display);font-size:1.02rem;line-height:1.15}.quick span{font-size:.8rem;color:var(--muted)}
+.card ul ul{margin-top:7px}
+
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px}
+.tabs a{display:flex;align-items:center;justify-content:center;gap:6px;min-height:42px;border-radius:10px;text-decoration:none;color:var(--muted);font-weight:600;font-size:.95rem}
+.tabs a[aria-current="page"]{background:var(--accent);color:var(--on-accent)}
+.badge{background:var(--crit);color:var(--surface);border-radius:999px;font-size:.75rem;font-weight:700;min-width:20px;padding:1px 6px;text-align:center;font-variant-numeric:tabular-nums}
+.asbtn{border:0;font:inherit;cursor:pointer;width:100%;text-align:left}
+button.back.asbtn{background:none;width:auto;padding:0}
+.aslink{text-decoration:none;color:inherit;display:inline-flex;align-items:center}
+.wide{width:100%}
+.warnbox{border-left:5px solid var(--warn);background:var(--surface);border-radius:0 12px 12px 0;padding:10px 12px;font-size:.9rem}
+.crumbs{display:flex;flex-direction:column;gap:6px}
+.crumb{display:flex;flex-direction:column;gap:1px;text-align:left;background:none;border:0;border-left:3px solid var(--accent);padding:4px 0 4px 12px;min-height:44px;justify-content:center}
+.crumb span{font-size:.8rem;color:var(--muted)}.crumb b{font-weight:600;font-size:.95rem}
+.tq,.leaf{background:var(--surface);border:1.5px solid var(--accent);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:12px}
+.tq ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px;font-size:.95rem}
+.tq a,.leaf a{color:var(--accent);font-weight:600}
+.topt{width:100%;text-align:left;background:var(--tint);border:1.5px solid var(--tint);border-radius:14px;padding:13px 14px;min-height:52px;font-weight:600}
+.topt:active{border-color:var(--accent)}
+.leaf{border-width:0 0 0 6px;border-style:solid;border-color:var(--line);border-radius:6px 18px 18px 6px;gap:4px}
+.leaf.ok{border-color:var(--ok)}.leaf.warn{border-color:var(--warn)}.leaf.crit{border-color:var(--crit)}
+.leaf h2{font-size:1.35rem;line-height:1.15}
+.elist{display:flex;flex-direction:column;gap:10px}
+.ecard{display:flex;flex-direction:column;gap:4px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--gc);border-radius:6px 16px 16px 6px;padding:12px 14px}
+.ecard{padding:0;gap:0}
+.eopen{display:flex;flex-direction:column;gap:4px;width:100%;text-align:left;background:none;border:0;padding:12px 14px 10px;font:inherit;color:inherit}
+.qrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 12px 12px}
+.st.tap{min-height:44px;font-size:.92rem;font-weight:600;background:var(--paper);color:var(--ink);border-width:1.5px;cursor:pointer}
+.st.tap.on{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.ecard.done .eopen{opacity:.6}
+.ecard .d{font-size:.88rem;color:var(--muted)}
+.eh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.86rem}
+.eh b{font-family:var(--display);font-size:1.05rem;font-variant-numeric:tabular-nums}
+.etype{display:inline-flex;align-items:center;color:var(--muted);font-weight:600}
+.eurg{background:var(--crit);color:var(--surface);border-radius:999px;padding:1px 9px;font-weight:700;font-size:.78rem}
+.sts{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.st{font-size:.78rem;border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--muted)}
+.st.on{background:var(--ok);border-color:var(--ok);color:var(--surface);font-weight:600}
+.st.warn{border-color:var(--warn);color:var(--warn);font-weight:600}
+.st.crit{background:var(--crit);border-color:var(--crit);color:var(--surface);font-weight:700}
+.cf{display:flex;flex-direction:column;gap:5px;min-width:0}
+.cf label,.cf .lab{font-weight:600;font-size:.92rem}
+.cf input,.cf textarea,.addrow input{width:100%;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;min-height:46px;font:inherit;color:inherit}
+.cf textarea{resize:vertical;line-height:1.4}
+.two{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:start}
+.addrow{display:flex;gap:8px;align-items:center}.addrow input{flex:1;min-width:0}
+.todo{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 8px 6px 10px;margin-bottom:6px}
+.chk{width:30px;height:30px;border-radius:9px;border:2px solid var(--line);background:var(--paper);padding:0;position:relative}
+.chk[aria-pressed="true"]{background:var(--ok);border-color:var(--ok)}
+.chk[aria-pressed="true"]::after{content:"";position:absolute;left:9px;top:4px;width:7px;height:13px;border:solid var(--surface);border-width:0 3px 3px 0;transform:rotate(45deg)}
+.tdone{text-decoration:line-through;color:var(--muted)}
+.chip.sm{min-height:38px;padding:6px 12px;font-size:.88rem}
+.chip.danger{border-color:var(--crit);color:var(--crit);font-weight:700}
+.chip .dot{width:9px;height:9px;margin-right:7px}
+.chip[aria-pressed="true"] .dot{background:var(--on-accent)}
+
+.minirow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.minirow .ghost{min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-weight:600;line-height:1.15}
+.bkbtn small{font-weight:400;font-size:.76rem;color:var(--muted)}
+.bkbtn.old{border-color:var(--warn)}.bkbtn.old small{color:var(--warn);font-weight:600}
+details.restore summary{font-size:.88rem;color:var(--muted);cursor:pointer;padding:6px 0}
+#cbk textarea,details.restore textarea,.fsec details textarea{width:100%;margin:8px 0;background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:10px;font:inherit;font-size:.85rem;color:inherit}
+.ctime{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--muted);font-weight:600}
+.ctime input{font-family:var(--display);font-weight:800;font-size:1.5rem;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:4px 8px;min-height:46px;font-variant-numeric:tabular-nums}
+.nomage{grid-template-columns:1fr 96px}
+textarea.bignotes{min-height:62vh;font-size:1.06rem;line-height:1.5}
+.arow{display:grid;grid-template-columns:1fr auto;gap:6px 8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px}
+.arow input[data-an="l"]{grid-column:1/-1;border:0;min-height:36px;padding:2px 6px;font-weight:600}
+.arow input{width:100%;min-width:0;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;min-height:46px;font:inherit;color:inherit}
+.surv{display:flex;flex-direction:column;gap:3px;border-left:6px solid var(--line);background:var(--surface);border-radius:6px 14px 14px 6px;padding:12px 14px}
+.surv.ok{border-color:var(--ok)}.surv.crit{border-color:var(--crit)}
+.surv b{font-family:var(--display);font-size:1.25rem;line-height:1.15;font-variant-numeric:tabular-nums}
+.sched{display:flex;flex-wrap:wrap;gap:6px 12px;font-variant-numeric:tabular-nums}
+a.ghost{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;color:inherit}
+.warnbox a{color:var(--accent);font-weight:600}
+
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg button{border:0;background:none;border-radius:9px;min-height:40px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--tint);color:var(--accent)}
+.ftchips .chip{min-height:40px;padding:7px 13px}
+.fl{display:flex;flex-direction:column;align-items:stretch}
+.fl-head{display:flex;flex-direction:column;gap:2px;margin-bottom:12px}
+.fl-head h2{font-size:1.5rem}
+.fl ul{margin:6px 0 0;padding-left:1.05em;display:flex;flex-direction:column;gap:4px;font-size:.9rem;line-height:1.38}
+.fl-step,.fl-q,.fl-end{border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.fl-step{background:var(--surface);border:1px solid var(--line)}
+.fl-q{background:var(--accent);color:var(--on-accent)}
+.fl-q b{font-family:var(--display);font-size:1.02rem;line-height:1.2}
+.fl-q .muted{color:var(--on-accent);opacity:.88}
+.fl-q a{color:var(--on-accent);font-weight:700}
+.fl-end{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--line);border-radius:6px 12px 12px 6px}
+.fl-end.ok{border-left-color:var(--ok)}.fl-end.warn{border-left-color:var(--warn)}.fl-end.crit{border-left-color:var(--crit)}
+.fl-end b{font-family:var(--display);font-size:1rem;line-height:1.2}
+.fl-brs{display:flex;flex-direction:column;gap:10px;margin:0 0 0 10px;padding:10px 0 2px 12px;border-left:2.5px solid var(--accent)}
+.fl-br{display:flex;flex-direction:column;position:relative}
+.fl-br::before{content:"";position:absolute;left:-12px;top:13px;width:10px;border-top:2.5px solid var(--accent)}
+.fl-lab{align-self:flex-start;background:var(--tint);color:var(--accent);font-weight:700;font-size:.84rem;line-height:1.25;border-radius:8px;padding:4px 9px;margin-bottom:6px}
+.fl-down{display:block;width:2.5px;height:14px;background:var(--line);margin:2px 0 2px 18px}
+.fl-goto{align-self:flex-start;background:var(--surface);border:1.5px dashed var(--accent);color:var(--accent);font-weight:700;border-radius:12px;padding:9px 14px;min-height:44px}
+.fl-links{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:6px;font-size:.86rem}
+.fl-links a{color:var(--accent);font-weight:600}
+.legend{display:flex;flex-direction:column;gap:4px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:8px}
+.lg{width:14px;height:14px;border-radius:3px;display:inline-block}.lg.ok{background:var(--ok)}.lg.warn{background:var(--warn)}.lg.crit{background:var(--crit)}
+
+/* Result bar */
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgb(18 24 54 / .10)}
+.bar-in{max-width:620px;margin:0 auto;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;border-left:5px solid var(--line);padding-left:12px}
+.bar.ok .bar-in{border-color:var(--ok)} .bar.warn .bar-in{border-color:var(--warn)} .bar.crit .bar-in{border-color:var(--crit)}
+.big{font-family:var(--display);font-weight:800;font-size:2.5rem;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.big span{font-size:1rem;font-weight:600;color:var(--muted);letter-spacing:0}
+.big.text{font-size:1.5rem}
+.verdict{font-size:.92rem;line-height:1.3}
+.copy{background:var(--accent);color:var(--on-accent);border:0;border-radius:12px;padding:12px 16px;font-weight:700;min-height:48px}
+.copy:disabled{opacity:.45}
+#fallback{max-width:620px;margin:0 auto 10px}
+#fallback textarea{width:100%;height:110px;font:inherit;font-size:.85rem;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px}
+@media (max-width:380px){ h1{font-size:2rem} .elapsed{font-size:2.8rem} .big{font-size:2rem} }
+@media (prefers-reduced-motion:no-preference){ .opt,.tog{transition:background-color .12s,border-color .12s} }
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+/* ---------- Données cliniques ---------- */
+const yn=(l,p=1,h)=>({l,h,yn:1,o:[['Non',0],['Oui',p]]});
+const mot=["0 pas de déficit","1 affaissement avant la fin, sans toucher le plan du lit","2 effort contre la pesanteur mais chute sur le plan du lit","3 pas d'effort contre la pesanteur","4 absence de mouvement"];
+const limb=(l,h)=>({l,h,o:[...mot.map((m,i)=>[m[2].toUpperCase()+m.slice(3),i]),['Cotation impossible (amputation, arthrodèse)',0,'X']]});
+const pct=(a,t)=>a[Math.min(t,a.length-1)];
+
+const TOOLS=[
+{id:'carnet',n:'Carnet de garde',d:'Les appels de la nuit, le suivi, les transmissions',type:'carnet'},
+{id:'annuaire',n:'Annuaire de garde',d:'Les numéros utiles de la nuit',type:'annuaire'},
+{id:'arbre',n:'Arbre AVC',d:"De l'appel à la décision, une question à la fois",type:'arbre'},
+{id:'alerte',g:'alerte',n:'Alerte pas à pas',d:"Questions, gestes et décision, dans l'ordre",type:'ref',
+ html:`<ol class="steps">
+<li><h2>Dater le début</h2><ul><li>Heure précise du début. Sinon, dernière fois vu normal.</li><li>Constaté au réveil ? Heure du coucher, lever nocturne.</li><li>Un témoin joignable, avec son numéro.</li><li>Lancer le chrono sur la page d'accueil.</li></ul></li>
+<li><h2>Les questions qui changent la décision</h2><ul><li><b>Anticoagulant</b> : lequel, quelle dose, heure de la dernière prise. Antiagrégant.</li><li>AVC, traumatisme crânien ou chirurgie dans les 3 derniers mois.</li><li>Antécédent d'hémorragie intracrânienne, saignement récent, cancer évolutif.</li><li>Crise convulsive au début. Céphalée brutale. Douleur thoracique ou dorsale.</li><li>Autonomie antérieure (<a href="#mrs">Rankin</a>), âge, <b>poids</b>.</li><li>Diabète, insuffisance rénale, grossesse ou accouchement récent.</li><li>Pacemaker ou autre contre-indication à l'IRM, allergie à l'iode.</li></ul></li>
+<li><h2>Les gestes immédiats</h2><ul><li>Glycémie capillaire, pression artérielle aux deux bras, saturation, température.</li><li><a href="#nihss">NIHSS</a>, avec l'heure.</li><li>Deux voies veineuses, sérum physiologique, à jeun.</li><li>Bilan : NFS et plaquettes, TP et INR, TCA, ionogramme, créatinine, glycémie, troponine. Dosage spécifique si anticoagulant direct. β-hCG si besoin.</li><li>ECG, sans retarder l'imagerie.</li><li>Pas de sonde urinaire ni de geste invasif avant la décision.</li></ul></li>
+<li><h2>L'imagerie, avec quatre réponses à obtenir</h2><ul><li>IRM (diffusion, FLAIR, T2*, TOF) ou scanner avec angioscanner du cou et du polygone.</li><li>Y a-t-il une hémorragie ?</li><li>Y a-t-il une occlusion proximale ? (<a href="#race">RACE</a> pour l'anticiper)</li><li>Quelle étendue ? (<a href="#aspects">ASPECTS</a>)</li><li>Si l'heure est inconnue : y a-t-il un mismatch diffusion-FLAIR ou de perfusion ?</li></ul></li>
+<li><h2>La décision</h2>
+<div class="branch crit"><b>Hémorragie</b><span>Pas de thrombolyse. <a href="#ta">pression sous 140/90</a>, <a href="#reversion">réversion</a> d'un anticoagulant, <a href="#ich">ICH score</a>, avis neurochirurgical.</span></div>
+<div class="branch ok"><b>Ischémie de moins de 4 h 30, déficit invalidant</b><span>Vérifier les <a href="#thrombolyse">contre-indications</a>, ramener la pression <a href="#ta">sous 185/110</a>, puis thrombolyse : <a href="#dose">dose selon le poids</a>.</span></div>
+<div class="branch ok"><b>Occlusion proximale</b><span>Appeler le neuroradiologue interventionnel : <a href="#thrombectomie">thrombectomie</a>, en plus de la thrombolyse si elle est possible, jusqu'à 24 h sur sélection.</span></div>
+<div class="branch warn"><b>Heure inconnue, ou entre 4 h 30 et 9 h</b><span>Thrombolyse possible si l'imagerie montre un <a href="#thrombectomie">mismatch</a>.</span></div>
+<div class="branch"><b>Déficit mineur non invalidant, ou AIT</b><span>Pas de thrombolyse. <a href="#abcd2">ABCD2</a> et <a href="#dapt">bithérapie antiplaquettaire</a>.</span></div></li>
+<li><h2>Après la thrombolyse</h2><ul><li>NIHSS et pression artérielle toutes les 15 minutes pendant 2 h, toutes les 30 minutes pendant 6 h, puis toutes les heures jusqu'à 24 h.</li><li>Pression <a href="#ta">sous 180/105</a>.</li><li>Aucun antithrombotique ni geste invasif pendant 24 h.</li><li>Imagerie de contrôle à 24 h, avant de débuter l'antiagrégant.</li><li>Aggravation, céphalée ou vomissements : arrêt de la perfusion et imagerie en urgence.</li><li>Surveiller la langue et les lèvres : risque d'angio-œdème, surtout sous IEC.</li></ul></li>
+</ol><a class="start" href="#entree">Rédiger le mot d'entrée<span>à cocher</span></a><p class="note">Trame de travail à valider avec le neurologue de garde et le protocole du service.</p>`},
+{id:'entree',g:'alerte',n:"Mot d'entrée",d:'Coche les réponses, le mot se rédige tout seul',type:'form'},
+{id:'nihss',g:'alerte',n:'NIHSS',d:'Gravité du déficit, de 0 à 42',type:'score',max:42,
+ items:[
+  {l:'Vigilance',o:[['Normale, réactions vives',0],['Obnubilation, éveil adapté aux stimulations nociceptives',1],['Coma, réponse adaptée aux stimulations nociceptives',2],['Coma grave, réponse stéréotypée ou aucune réponse motrice',3]]},
+  {l:'Orientation',h:'Mois et âge',o:[['Deux réponses exactes',0],['Une réponse exacte',1],['Aucune réponse exacte',2]]},
+  {l:'Commandes',h:'Ouverture des yeux, du poing',o:[['Deux ordres effectués',0],['Un ordre effectué',1],['Aucun ordre effectué',2]]},
+  {l:'Oculomotricité',o:[['Normale',0],['Ophtalmoplégie partielle ou déviation réductible du regard',1],['Ophtalmoplégie horizontale complète ou déviation forcée du regard',2]]},
+  {l:'Champ visuel',o:[['Normal',0],['Quadranopsie latérale homonyme, hémianopsie incomplète ou négligence visuelle unilatérale',1],['Hémianopsie latérale homonyme franche',2],['Cécité bilatérale ou coma',3]]},
+  {l:'Paralysie faciale',o:[['Normale',0],['Asymétrie modérée, paralysie faciale unilatérale incomplète',1],['Paralysie faciale centrale unilatérale franche',2],['Paralysie faciale périphérique ou diplégie faciale',3]]},
+  limb('Motricité du membre supérieur gauche','Bras tendu 10 secondes'),
+  limb('Motricité du membre supérieur droit','Bras tendu 10 secondes'),
+  limb('Motricité du membre inférieur gauche','Jambe tendue 5 secondes'),
+  limb('Motricité du membre inférieur droit','Jambe tendue 5 secondes'),
+  {l:'Ataxie',o:[['Absente',0],['Un membre',1],['Deux membres ou plus',2]]},
+  {l:'Sensibilité',o:[['Normale',0],['Hypoesthésie minime à modérée',1],['Hypoesthésie sévère ou anesthésie',2]]},
+  {l:'Langage',o:[["Pas d'aphasie",0],['Aphasie discrète à modérée',1],['Aphasie sévère',2],['Mutisme, aphasie totale',3]]},
+  {l:'Dysarthrie',o:[['Normale',0],['Discrète à modérée',1],['Sévère',2],['Cotation impossible (intubation)',0,'X']]},
+  {l:'Extinction, négligence',o:[['Absente',0],['Extinction dans une seule modalité ou négligence partielle',1],["Négligence sévère, anosognosie ou extinction dans plus d'une modalité",2]]}
+ ],
+ interp:t=>t===0?['Pas de déficit coté','ok']:t<=4?['AVC mineur','ok']:t<=15?['AVC modéré','warn']:t<=20?['AVC modéré à sévère','crit']:['AVC sévère','crit'],
+ copy:(t,s,tot)=>'NIHSS à '+tot+' :\n'+t.items.map((it,i)=>'- '+it.l+(it.h&&!/secondes/.test(it.h)?' ('+it.h.toLowerCase()+')':'')+' : '+(it.o[s[i]][2]||it.o[s[i]][1])).join('\n')},
+
+{id:'thrombolyse',g:'alerte',n:'Contre-indications à la thrombolyse',d:'Liste à cocher avant le bolus',type:'score',unit:'cochée(s)',
+ items:[
+  yn("Hémorragie intracrânienne à l'imagerie"),
+  yn('Début des symptômes au-delà de 4 h 30 ou heure inconnue',1,"Sauf sélection par imagerie (mismatch)"),
+  yn('Déficit mineur non invalidant ou en régression rapide'),
+  yn("Suspicion d'hémorragie méningée"),
+  yn('Pression artérielle au-dessus de 185/110 malgré traitement'),
+  yn('Glycémie inférieure à 0,5 g/L ou supérieure à 4 g/L'),
+  yn('Plaquettes inférieures à 100 000/mm³'),
+  yn('AVK avec INR supérieur à 1,7',1,"Seuil des recommandations ; le RCP de l'altéplase retient 1,3"),
+  yn('Anticoagulant oral direct pris depuis moins de 48 h',1,'Sauf dosage négligeable ou réversion (dabigatran)'),
+  yn('Héparine à dose curative dans les 24 h',1,'Avec TCA allongé pour une héparine non fractionnée'),
+  yn('AVC ischémique ou traumatisme crânien sévère depuis moins de 3 mois'),
+  yn("Antécédent d'hémorragie intracrânienne"),
+  yn('Chirurgie majeure ou traumatisme majeur dans les 14 jours'),
+  yn('Hémorragie digestive ou urinaire dans les 21 jours, ou saignement actif'),
+  yn('Tumeur intracrânienne, malformation artérioveineuse ou anévrisme'),
+  yn('Endocardite, péricardite ou dissection aortique'),
+  yn("Ponction lombaire ou ponction d'un vaisseau non compressible dans les 7 jours"),
+  yn('Crise convulsive au début',1,"Possible si le déficit n'est pas post-critique"),
+  yn('Hépatopathie sévère, accouchement récent, massage cardiaque traumatique ou prolongé')
+ ],
+ interp:t=>t===0?['Aucune contre-indication cochée','ok']:['À discuter avec le neurologue avant tout bolus','crit'],
+ note:"Aide à la vérification, tirée du RCP de l'altéplase et des recommandations. Plusieurs contre-indications sont relatives : la décision se prend avec le neurologue."},
+
+{id:'dose',g:'alerte',n:'Dose de thrombolytique',d:'Altéplase et ténectéplase selon le poids',type:'calc',
+ inputs:[{id:'p',l:'Poids',u:'kg'}],
+ fn:v=>{ if(!(v.p>=30&&v.p<=250)) return null;
+  const r=x=>(Math.round(x*10)/10).toString().replace('.',',');
+  const a=Math.min(0.9*v.p,90), tn=Math.min(0.25*v.p,25);
+  return {v:r(tn)+' mg',t:'ténectéplase, ou altéplase '+r(a)+' mg',
+   html:`<ul><li><b>Ténectéplase 0,25 mg/kg</b> (maximum 25 mg) : <b>${r(tn)} mg</b> en bolus intraveineux unique.</li><li><b>Altéplase 0,9 mg/kg</b> (maximum 90 mg) : <b>${r(a)} mg</b> au total, dont <b>${r(a*0.1)} mg</b> en bolus sur 1 minute puis <b>${r(a*0.9)} mg</b> sur 60 minutes.</li></ul>`,
+   copy:`Poids ${r(v.p)} kg. Ténectéplase 0,25 mg/kg : ${r(tn)} mg en bolus. Altéplase 0,9 mg/kg : ${r(a)} mg (bolus ${r(a*0.1)} mg puis ${r(a*0.9)} mg sur 60 min).`}; },
+ note:"Doses de l'AVC ischémique (ESO 2023, HAS 2024). Ne pas utiliser la dose de l'infarctus du myocarde."},
+
+{id:'ta',g:'alerte',n:'Objectifs tensionnels',d:'Avant et après reperfusion, hématome',type:'ref',
+ html:`<div class="card"><h2>Infarctus cérébral</h2><ul><li>Avant thrombolyse : en dessous de <b>185/110</b>.</li><li>Pendant et 24 h après thrombolyse : en dessous de <b>180/105</b>.</li><li>Après thrombectomie : en dessous de <b>180/105</b>, sans baisse intensive.</li><li>Sans reperfusion : respecter jusqu'à <b>220/120</b>. Au-delà, baisse prudente d'environ 15 % sur 24 h.</li></ul></div><div class="card"><h2>Hématome intracérébral</h2><ul><li>Objectif retenu dans le service : en dessous de <b>140/90</b>, à atteindre rapidement et à maintenir stable.</li></ul></div><p class="note">ESO 2021, AHA/ASA 2022. À adapter au protocole du service.</p>`},
+
+{id:'thrombectomie',g:'alerte',n:'Thrombectomie et fenêtres tardives',d:"Critères, AVC du réveil",type:'ref',
+ html:`<div class="card"><h2>Moins de 6 heures</h2><ul><li>Occlusion proximale de la circulation antérieure : carotide interne, M1 (M2 proximale à discuter).</li><li>Déficit invalidant, habituellement NIHSS à 6 ou plus.</li><li>ASPECTS à 6 ou plus.</li><li>En plus de la thrombolyse si elle est possible, sans retarder le geste.</li></ul></div><div class="card"><h2>De 6 à 24 heures</h2><ul><li>Sélection par imagerie : mismatch clinico-radiologique ou de perfusion (critères DAWN et DEFUSE-3).</li><li>Tronc basilaire : jusqu'à 24 h, NIHSS à 10 ou plus dans les essais.</li><li>Infarctus étendu (ASPECTS 3 à 5) : bénéfice montré dans les essais récents, à discuter avec le neuroradiologue.</li></ul></div><div class="card"><h2>AVC du réveil ou d'heure inconnue</h2><ul><li>Thrombolyse si mismatch diffusion-FLAIR à l'IRM.</li><li>Ou mismatch de perfusion entre 4 h 30 et 9 h.</li></ul></div><p class="note">ESO 2019, 2021 et 2023.</p>`},
+
+{id:'befast',g:'reco',n:'BE-FAST',d:"Reconnaître un AVC en six lettres",type:'ref',
+ html:`<div class="card"><ul><li><b>B</b>alance : trouble brutal de l'équilibre ou de la marche.</li><li><b>E</b>yes : baisse de vision, diplopie, amputation du champ visuel.</li><li><b>F</b>ace : asymétrie du visage.</li><li><b>A</b>rm : faiblesse d'un bras ou d'une jambe.</li><li><b>S</b>peech : trouble de la parole ou du langage.</li><li><b>T</b>ime : heure de début ou de dernière fois vu normal, puis alerte.</li></ul></div><p class="note">Glycémie capillaire d'abord : l'hypoglycémie est le premier diagnostic différentiel à écarter.</p>`},
+
+{id:'rosier',g:'reco',n:'ROSIER',d:'AVC ou diagnostic différentiel, de -2 à 5',type:'score',
+ items:[yn('Perte de connaissance ou syncope',-1),yn('Crise convulsive',-1),yn('Asymétrie faciale',1,'Signe nouveau, de début brutal'),yn("Faiblesse asymétrique d'un bras"),yn("Faiblesse asymétrique d'une jambe"),yn('Trouble de la parole'),yn('Déficit du champ visuel')],
+ interp:t=>t>0?['AVC probable','crit']:['AVC peu probable, mais pas exclu','ok'],
+ note:"Corriger d'abord une hypoglycémie puis réévaluer."},
+
+{id:'race',g:'reco',n:'RACE',d:'Occlusion de gros vaisseau, de 0 à 9',type:'score',max:9,
+ items:[
+  {l:'Paralysie faciale',o:[['Absente',0],['Légère',1],['Modérée à sévère',2]]},
+  {l:'Motricité du bras',h:'10 secondes',o:[['Normale ou légère dérive',0],['Modérée : lève le bras mais ne tient pas 10 secondes',1],['Sévère : ne lève pas contre la pesanteur',2]]},
+  {l:'Motricité de la jambe',h:'5 secondes',o:[['Normale ou légère dérive',0],['Modérée : lève la jambe mais ne tient pas 5 secondes',1],['Sévère : ne lève pas contre la pesanteur',2]]},
+  {l:'Déviation de la tête et des yeux',o:[['Absente',0],['Présente',1]]},
+  {l:'Aphasie ou agnosie',h:"Hémiparésie droite : deux ordres (fermer les yeux, serrer le poing). Hémiparésie gauche : reconnaît-il son bras et son déficit ?",o:[['Deux réponses correctes',0],['Une seule réponse correcte',1],['Aucune réponse correcte',2]]}
+ ],
+ interp:t=>t>=5?['Occlusion de gros vaisseau probable','crit']:['Occlusion de gros vaisseau moins probable','ok']},
+
+{id:'hints',g:'reco',n:'HINTS plus',d:'Vertige aigu continu avec nystagmus',type:'score',unit:'signe(s) central(aux)',
+ items:[
+  {l:'Head impulse test',o:[['Anormal : saccade de rattrapage',0],['Normal : pas de saccade',1]]},
+  {l:'Nystagmus',o:[['Horizontal, unidirectionnel',0],['Changeant de direction, vertical ou torsionnel pur',1]]},
+  {l:'Test of skew',h:"Test de l'écran alterné",o:[['Pas de déviation verticale',0],['Déviation verticale',1]]},
+  {l:'Audition (le « plus »)',h:'Frottement des doigts de chaque côté',o:[['Pas de surdité nouvelle',0],['Surdité brutale du côté du vertige',1]]}
+ ],
+ interp:t=>t===0?['Profil périphérique : les quatre signes sont rassurants','ok']:['Au moins un signe central : origine centrale à éliminer','crit'],
+ note:"Valable seulement pour un syndrome vestibulaire aigu continu, avec nystagmus présent au moment de l'examen. Une surdité brutale associée peut traduire une ischémie de l'artère cérébelleuse antéro-inférieure."},
+
+{id:'abcd2',g:'ait',n:'ABCD2',d:"Risque d'AVC après un AIT, de 0 à 7",type:'score',max:7,
+ items:[
+  yn('Âge de 60 ans ou plus'),
+  yn('Pression artérielle à 140/90 ou plus',1,'Systolique ≥ 140 ou diastolique ≥ 90'),
+  {l:'Clinique',h:'Une seule réponse : la plus élevée qui s\'applique',d:-1,o:[['Autre symptôme isolé : sensitif, visuel, vertige, trouble de la marche',0],['Trouble de la parole sans déficit moteur',1],['Déficit moteur unilatéral',2]]},
+  {l:'Durée des symptômes',d:-1,o:[['Moins de 10 minutes',0],['De 10 à 59 minutes',1],['60 minutes ou plus',2]]},
+  yn('Diabète')
+ ],
+ interp:t=>t<=3?["Risque faible : environ 1 % d'AVC à 2 jours",'ok']:t<=5?["Risque modéré : environ 4 % d'AVC à 2 jours",'warn']:["Risque élevé : environ 8 % d'AVC à 2 jours",'crit'],
+ note:"Un score bas ne dispense pas du bilan en urgence. Score à 4 ou plus : AIT à haut risque."},
+
+{id:'dapt',g:'ait',n:'Bithérapie antiplaquettaire',d:'AIT à haut risque et AVC mineur',type:'ref',
+ html:`<div class="card"><h2>Pour qui</h2><ul><li>AVC ischémique mineur (NIHSS à 3 ou moins) ou AIT à haut risque (ABCD2 à 4 ou plus).</li><li>Mécanisme non cardio-embolique, pas de thrombolyse.</li></ul></div><div class="card"><h2>Comment</h2><ul><li>Début dans les 24 h.</li><li>Aspirine : charge de <b>160 à 300 mg</b> le premier jour (trame du service : ASPEGIC 250 mg IV), puis 75 mg par jour.</li><li>Clopidogrel : charge de <b>300 mg</b> le premier jour, puis 75 mg par jour.</li><li>Durée : <b>21 jours</b>, puis un seul antiagrégant.</li></ul></div><div class="card"><h2>Variante</h2><ul><li>Aspirine et ticagrélor pendant 30 jours, jusqu'à NIHSS 5.</li></ul></div><p class="note">ESO 2021, essais CHANCE, POINT et THALES.</p>`},
+
+{id:'ich',g:'hema',n:'ICH score',d:"Gravité d'un hématome, de 0 à 6",type:'score',max:6,
+ items:[
+  {l:'Score de Glasgow',o:[['13 à 15',0],['5 à 12',1],['3 ou 4',2]]},
+  yn("Volume de l'hématome de 30 mL ou plus"),
+  yn('Hémorragie intraventriculaire'),
+  yn('Origine sous-tentorielle'),
+  yn('Âge de 80 ans ou plus')
+ ],
+ interp:t=>['Mortalité à 30 jours dans la cohorte initiale : '+pct([0,13,26,72,97,100,100],t)+' %',t<=1?'ok':t===2?'warn':'crit'],
+ note:"Outil de description, pas de décision : ne pas limiter les soins sur ce seul score."},
+
+{id:'abc2',g:'hema',n:"Volume de l'hématome",d:'Méthode ABC/2',type:'calc',
+ inputs:[{id:'a',l:'A',h:'Plus grand diamètre',u:'cm'},{id:'b',l:'B',h:'Diamètre perpendiculaire',u:'cm'},{id:'c',l:'C',h:'Hauteur : nombre de coupes × épaisseur',u:'cm'}],
+ fn:v=>{ if(!(v.a>0&&v.b>0&&v.c>0)) return null; const x=v.a*v.b*v.c/2, s=(Math.round(x*10)/10).toString().replace('.',',');
+  return {v:s+' mL',t:x>=30?'30 mL ou plus : 1 point au ICH score':'Moins de 30 mL',lvl:x>=30?'crit':'ok',copy:"Volume de l'hématome (ABC/2) : "+s+' mL'}; }},
+
+{id:'glasgow',g:'hema',n:'Score de Glasgow',d:'De 3 à 15',type:'score',max:15,
+ items:[
+  {l:'Ouverture des yeux',o:[['Spontanée',4],['À la demande',3],['À la douleur',2],['Aucune',1]]},
+  {l:'Réponse verbale',o:[['Orientée',5],['Confuse',4],['Mots inappropriés',3],['Sons incompréhensibles',2],['Aucune',1]]},
+  {l:'Réponse motrice',o:[['Obéit aux ordres',6],['Orientée à la douleur',5],['Évitement',4],['Flexion stéréotypée',3],['Extension stéréotypée',2],['Aucune',1]]}
+ ],
+ interp:t=>t<=8?['Coma : protection des voies aériennes à discuter','crit']:t<=12?['Altération modérée de la vigilance','warn']:['Vigilance conservée ou peu altérée','ok'],
+ copy:(t,s,tot)=>'Glasgow '+tot+' (Y'+t.items[0].o[s[0]][1]+' V'+t.items[1].o[s[1]][1]+' M'+t.items[2].o[s[2]][1]+')'},
+
+{id:'reversion',g:'hema',n:'Réversion des anticoagulants',d:'Hématome sous AVK ou anticoagulant direct',type:'ref',
+ html:`<div class="card"><h2>AVK</h2><ul><li>Concentré de complexe prothrombinique (PPSB) <b>25 UI/kg</b> et vitamine K <b>10 mg</b>, sans attendre l'INR.</li><li>Objectif : INR à 1,2 ou moins. Contrôle à 30 minutes, complément si besoin.</li></ul></div><div class="card"><h2>Dabigatran</h2><ul><li>Idarucizumab <b>5 g</b> (deux doses de 2,5 g).</li><li>S'il manque : PPSB 50 UI/kg.</li></ul></div><div class="card"><h2>Apixaban, rivaroxaban, édoxaban</h2><ul><li>PPSB <b>50 UI/kg</b>.</li><li>Pas de réversion si la concentration est à 30 ng/mL ou moins.</li><li>Andexanet selon la disponibilité locale.</li></ul></div><div class="card"><h2>Autres</h2><ul><li>Héparine : protamine, dose selon l'héparine reçue.</li><li>Antiagrégants : pas de transfusion plaquettaire hors neurochirurgie.</li></ul></div><p class="note">Recommandations françaises 2024 sur les hémorragies sous anticoagulants, ESO 2019.</p>`},
+
+{id:'chadsvasc',n:'CHA2DS2-VA',d:'Risque embolique, de 0 à 8 (sans le sexe depuis 2024)',type:'score',max:8,
+ items:[
+  yn('Insuffisance cardiaque'),yn('Hypertension artérielle'),
+  {l:'Âge',d:-1,o:[['Moins de 65 ans',0],['De 65 à 74 ans',1],['75 ans ou plus',2]]},
+  yn('Diabète'),yn('AVC, AIT ou embolie systémique',2),
+  yn('Maladie vasculaire',1,'Infarctus du myocarde, artériopathie, plaque aortique')
+ ],
+ interp:t=>t>=2?['Anticoagulation recommandée','crit']:t===1?['Anticoagulation à envisager, selon le patient','warn']:['Risque faible','ok'],
+ note:"Recommandations européennes 2024 : le sexe féminin ne compte plus, mêmes seuils pour les hommes et les femmes. Après un AVC ou un AIT, le score est d'emblée à 2 ou plus. Cardiomyopathie hypertrophique ou amylose cardiaque : anticoagulation quel que soit le score."},
+
+{id:'hasbled',g:'fa',n:'HAS-BLED',d:'Risque hémorragique, de 0 à 9',type:'score',max:9,
+ items:[
+  yn('Hypertension non contrôlée',1,'Systolique au-dessus de 160'),
+  yn('Insuffisance rénale',1,'Dialyse, greffe ou créatinine au-dessus de 200 µmol/L'),
+  yn('Insuffisance hépatique',1,'Cirrhose, ou bilirubine > 2 N associée à transaminases ou PAL > 3 N'),
+  yn('Antécédent d\'AVC'),
+  yn('Antécédent de saignement ou prédisposition'),
+  yn('INR labile',1,'Temps dans la cible inférieur à 60 %'),
+  yn('Âge supérieur à 65 ans'),
+  yn('Antiagrégant ou anti-inflammatoire associé'),
+  yn('Alcool',1,'8 verres ou plus par semaine')
+ ],
+ interp:t=>t>=3?['Risque hémorragique élevé : corriger les facteurs modifiables','crit']:['Risque hémorragique faible à modéré','ok'],
+ note:"Un score élevé ne contre-indique pas l'anticoagulation : il invite à corriger ce qui peut l'être."},
+
+{id:'reprise',g:'fa',n:"Reprise de l'anticoagulation",d:'Après un infarctus sur fibrillation atriale',type:'ref',
+ html:`<div class="card"><h2>Délai selon la taille de l'infarctus</h2><ul><li>AIT : d'emblée.</li><li>Infarctus mineur ou modéré : dans les <b>48 heures</b>.</li><li>Infarctus étendu : à <b>J6 ou J7</b>.</li></ul></div><div class="card"><h2>Avant de débuter</h2><ul><li>Imagerie de contrôle pour écarter une transformation hémorragique si l'infarctus est étendu.</li><li>Anticoagulant oral direct de préférence, dose adaptée à la fonction rénale.</li></ul></div><p class="note">Schéma précoce de l'essai ELAN. La méta-analyse CATALYST (2025) est en faveur d'un début dans les 4 jours. À valider avec le senior.</p>`},
+
+{id:'cockcroft',g:'fa',n:'Clairance de Cockcroft',d:'Avec les seuils des anticoagulants directs',type:'calc',
+ inputs:[{id:'age',l:'Âge',u:'ans'},{id:'p',l:'Poids',u:'kg'},{id:'cr',l:'Créatinine',u:'µmol/L'},{id:'sx',l:'Sexe',sel:[['1.23','Homme'],['1.04','Femme']]}],
+ fn:v=>{ if(!(v.age>0&&v.p>0&&v.cr>0&&v.sx>0)) return null;
+  const c=(140-v.age)*v.p*v.sx/v.cr, r=Math.round(c);
+  const k=(v.age>=80)+(v.p<=60)+(v.cr>=133);
+  const api=r<15?'non recommandé':(k>=2||r<30)?'2,5 mg deux fois par jour':'5 mg deux fois par jour';
+  const riv=r<15?'non recommandé':r<50?'15 mg par jour':'20 mg par jour';
+  const edo=r<15?'non recommandé':(r<=50||v.p<=60)?'30 mg par jour':'60 mg par jour';
+  const dab=r<30?'contre-indiqué':v.age>=80?'110 mg deux fois par jour':'150 mg deux fois par jour';
+  return {v:r+' mL/min',t:r<30?'Insuffisance rénale sévère':r<50?'Insuffisance rénale modérée':'Pas de réduction liée au rein seul',lvl:r<30?'crit':r<50?'warn':'ok',
+   html:`<ul><li>Apixaban : <b>${api}</b> (${k} critère(s) sur 3 : âge ≥ 80 ans, poids ≤ 60 kg, créatinine ≥ 133 µmol/L).</li><li>Rivaroxaban : <b>${riv}</b>.</li><li>Édoxaban : <b>${edo}</b> (30 mg si clairance de 15 à 50 ou poids ≤ 60 kg).</li><li>Dabigatran : <b>${dab}</b> (110 mg aussi sous vérapamil).</li></ul>`,
+   copy:'Clairance de Cockcroft : '+r+' mL/min'}; },
+ note:"Doses de la fibrillation atriale non valvulaire, d'après les RCP."},
+
+{id:'rope',g:'usinv',n:'Score RoPE',d:'Foramen ovale perméable, de 0 à 10',type:'score',max:10,
+ items:[
+  yn("Pas d'hypertension artérielle"),yn('Pas de diabète'),yn("Pas d'antécédent d'AVC ou d'AIT"),yn('Non-fumeur'),yn("Infarctus cortical à l'imagerie"),
+  {l:'Âge',d:-1,o:[['18 à 29 ans',5],['30 à 39 ans',4],['40 à 49 ans',3],['50 à 59 ans',2],['60 à 69 ans',1],['70 ans ou plus',0]]}
+ ],
+ interp:t=>['Part attribuable au foramen ovale : '+(t<=3?'environ 0':pct([0,0,0,0,38,34,62,72,84,88,88],t))+' %',t>=7?'crit':t>=4?'warn':'ok'],
+ note:"Pour un infarctus cryptogénique avec foramen ovale perméable. Score à 7 ou plus : lien probable."},
+
+{id:'ascod',g:'usinv',n:'ASCOD',d:'Classer la cause de l\'infarctus',type:'ref',
+ html:`<div class="card"><h2>Cinq lettres</h2><ul><li><b>A</b> : athérosclérose.</li><li><b>S</b> : maladie des petites artères.</li><li><b>C</b> : cardiopathie emboligène.</li><li><b>O</b> : autre cause.</li><li><b>D</b> : dissection.</li></ul></div><div class="card"><h2>Un grade par lettre</h2><ul><li><b>1</b> : cause potentielle de l'infarctus.</li><li><b>2</b> : lien de causalité incertain.</li><li><b>3</b> : maladie présente, lien peu probable.</li><li><b>0</b> : maladie absente.</li><li><b>9</b> : bilan insuffisant pour conclure.</li></ul></div><p class="note">Exemple : A1 S0 C3 O0 D0.</p>`},
+
+{id:'mrs',g:'usinv',n:'Rankin modifié',d:'Handicap, de 0 à 6',type:'score',max:6,
+ items:[{l:'Niveau',d:-1,o:[['Aucun symptôme',0],['Symptômes sans incapacité : activités habituelles conservées',1],['Incapacité légère : autonome, mais ne fait plus toutes ses activités antérieures',2],['Incapacité modérée : a besoin d\'aide, marche seul',3],['Incapacité modérément sévère : ne marche pas seul, aide pour les soins du corps',4],['Incapacité sévère : alité, incontinent, soins constants',5],['Décès',6]]}],
+ interp:t=>t<=2?['Autonome','ok']:t<=3?['Dépendance modérée','warn']:['Dépendance sévère','crit'],
+ copy:(t,s,tot)=>'Score de Rankin modifié : '+tot},
+
+{id:'a2ds2',g:'usinv',n:'A2DS2',d:'Risque de pneumopathie, de 0 à 10',type:'score',max:10,
+ items:[yn('Âge de 75 ans ou plus'),yn('Fibrillation atriale'),yn('Trouble de la déglutition',2),yn('Sexe masculin'),
+  {l:'NIHSS',o:[['0 à 4',0],['5 à 15',3],['16 ou plus',5]]}],
+ interp:t=>t>=5?['Risque élevé de pneumopathie','crit']:['Risque faible de pneumopathie','ok']},
+
+{id:'mrc',g:'usinv',n:'Testing moteur MRC',d:'Muscle par muscle, droite et gauche, de 0 à 5',type:'mrc'},
+
+{id:'aspects',g:'alerte',n:'ASPECTS',d:'Étendue de l\'ischémie sylvienne, de 10 à 0',type:'score',base:10,max:10,
+ items:['Noyau caudé','Noyau lenticulaire','Capsule interne','Insula','M1 : cortex sylvien antérieur','M2 : cortex sylvien latéral','M3 : cortex sylvien postérieur','M4 : au-dessus de M1','M5 : au-dessus de M2','M6 : au-dessus de M3'].map(x=>yn(x,-1)),
+ interp:t=>t>=6?['Infarctus limité','ok']:t>=3?['Infarctus étendu','warn']:['Infarctus très étendu','crit'],
+ note:"Cocher chaque région atteinte. Un point est retiré par région. Un score de 7 ou moins correspond à plus d'un tiers du territoire sylvien et à un risque hémorragique plus élevé après thrombolyse."},
+
+{id:'causes-infarctus',g:'theorie',n:"Causes d'un infarctus cérébral",d:"À quoi penser, selon l'imagerie et le terrain",type:'ref',
+ html:`<div class="card"><h2>Athérosclérose des grosses artères</h2><ul><li>Terrain : après 50 ans, facteurs de risque vasculaire, AIT répétés dans le même territoire.</li><li>Imagerie : sténose de 50 % ou plus, ou occlusion, sur l'artère du territoire. Infarctus jonctionnels ou multiples dans un seul territoire.</li></ul></div>
+<div class="card"><h2>Cardiopathie emboligène</h2><ul><li>Fibrillation atriale en tête. Aussi : thrombus ventriculaire, infarctus du myocarde récent, prothèse valvulaire mécanique, rétrécissement mitral, endocardite, myxome, cardiomyopathie dilatée.</li><li>Imagerie : infarctus corticaux, dans plusieurs territoires ou des deux côtés. Déficit maximal d'emblée.</li></ul></div>
+<div class="card"><h2>Maladie des petites artères</h2><ul><li>Infarctus profond de petite taille (moins de 15 à 20 mm), tableau lacunaire sans signe cortical.</li><li>Terrain : hypertension, diabète. Leucopathie, lacunes anciennes, microsaignements profonds.</li></ul></div>
+<div class="card"><h2>Dissection cervicale</h2><ul><li>Sujet jeune, douleur cervicale ou céphalée, traumatisme même minime.</li><li>Signe de Claude Bernard-Horner, acouphène pulsatile, atteinte des derniers nerfs crâniens.</li><li>Imagerie : hématome de paroi en T1 avec saturation de graisse.</li></ul></div>
+<div class="card"><h2>Causes plus rares, selon le contexte</h2><ul><li><b>Sujet jeune</b> : foramen ovale perméable (<a href="#rope">RoPE</a>), syndrome des antiphospholipides, thrombophilie, toxiques (cocaïne, cannabis), contraception œstroprogestative et migraine avec aura.</li><li><b>Origine afro-caribéenne</b> : drépanocytose.</li><li><b>Fièvre, souffle, syndrome inflammatoire</b> : endocardite. Pas de thrombolyse, hémocultures.</li><li><b>Cancer évolutif</b> : hypercoagulabilité, endocardite non infectieuse.</li><li><b>Céphalée en coup de tonnerre</b> : syndrome de vasoconstriction cérébrale réversible.</li><li><b>Atteinte systémique ou infarctus récidivants inexpliqués</b> : vascularite.</li><li><b>Histoire familiale, leucopathie étendue du sujet jeune</b> : CADASIL, maladie de Fabry.</li><li><b>Sténoses distales bilatérales des carotides</b> : moyamoya.</li></ul></div>
+<div class="card"><h2>Bilan de première ligne</h2><ul><li>Imagerie des artères du cou et du crâne.</li><li>ECG, télémétrie, puis Holter prolongé si rien n'est trouvé.</li><li>Échographie cardiaque transthoracique, transœsophagienne selon le contexte.</li><li>Bilan lipidique, HbA1c, NFS, CRP.</li><li>Classer avec <a href="#ascod">ASCOD</a>. Sans cause après un bilan complet : infarctus cryptogénique.</li></ul></div>
+<p class="note">Synthèse pédagogique rédigée de mémoire, à confronter à ton référentiel (Collège des enseignants de neurologie) et à tes seniors.</p>`},
+{id:'causes-hematome',g:'theorie',n:"Causes d'un hématome intracérébral",d:"À quoi penser, selon le siège et l'âge",type:'ref',
+ html:`<div class="card"><h2>Hématome profond</h2><ul><li>Noyaux gris, thalamus, tronc cérébral, cervelet, chez un hypertendu : <b>microangiopathie hypertensive</b>.</li><li>Arguments : leucopathie, lacunes, microsaignements profonds.</li></ul></div>
+<div class="card"><h2>Hématome lobaire du sujet âgé</h2><ul><li><b>Angiopathie amyloïde cérébrale</b> : après 55 ans, hématomes lobaires parfois récidivants.</li><li>En T2* : microsaignements strictement cortico-sous-corticaux, sidérose corticale superficielle (critères de Boston).</li></ul></div>
+<div class="card"><h2>Sujet jeune, ou hématome sans explication</h2><ul><li>Malformation artérioveineuse, anévrisme, cavernome, fistule durale.</li><li>Imagerie vasculaire en urgence, artériographie si le doute persiste.</li></ul></div>
+<div class="card"><h2>À ne pas manquer</h2><ul><li><b>Antithrombotiques et troubles de l'hémostase</b> : voir la <a href="#reversion">réversion</a>.</li><li><b>Thrombose veineuse cérébrale</b> : céphalées progressives, crises, post-partum, hématome juxta-cortical ou bilatéral.</li><li><b>Tumeur</b> : œdème disproportionné, prise de contraste.</li><li><b>Transformation hémorragique d'un infarctus</b>.</li><li><b>Toxiques</b> : cocaïne, amphétamines.</li><li><b>Endocardite</b> : anévrisme mycotique.</li><li><b>Vasoconstriction cérébrale réversible</b>.</li></ul></div>
+<div class="card"><h2>Bilan</h2><ul><li>Angioscanner à la phase aiguë.</li><li>IRM avec T2* ou SWI.</li><li>Hémostase, plaquettes, toxiques selon le contexte.</li><li>IRM injectée à 3 mois si aucune cause n'est trouvée (trame du service).</li><li>Gravité : <a href="#ich">ICH score</a>.</li></ul></div>
+<p class="note">Synthèse pédagogique rédigée de mémoire, à confronter à ton référentiel et à tes seniors.</p>`},
+{id:'complications',n:'Complications de la thrombolyse',d:'Hémorragie, angio-œdème : quoi faire tout de suite',type:'ref',
+ html:`<div class="card"><h2>Quand suspecter une hémorragie intracrânienne</h2><ul><li>Aggravation du NIHSS, baisse de vigilance.</li><li>Céphalée nouvelle, nausées ou vomissements.</li><li>Poussée hypertensive brutale.</li></ul></div>
+<div class="card"><h2>Conduite immédiate</h2><ul><li><b>Arrêter la perfusion</b> d'altéplase si elle est en cours. Appeler le neurologue senior.</li><li>Scanner cérébral sans injection en urgence.</li><li>Prélever : NFS et plaquettes, TP et INR, TCA, <b>fibrinogène</b>, groupe et RAI.</li><li>Si l'hémorragie est confirmée : corriger le fibrinogène (objectif d'au moins 1,5 g/L selon l'AHA, 1 g/L selon le RCP de l'Actilyse ; concentré de fibrinogène ou cryoprécipité selon le protocole local) et discuter l'<b>acide tranexamique 1 g IV en 10 minutes</b>.</li><li>Pression artérielle : voir les <a href="#ta">objectifs de l'hématome</a>.</li><li>Avis neurochirurgical et réanimation.</li></ul></div>
+<div class="card"><h2>Angio-œdème de la langue et des lèvres</h2><ul><li>Plus fréquent sous IEC. Souvent unilatéral, du côté du déficit.</li><li>Arrêter la perfusion et l'IEC. Prévenir tôt le réanimateur : le risque est l'obstruction des voies aériennes.</li><li>Méthylprednisolone <b>125 mg</b> IV, antihistaminique H1 IV et anti-H2 IV.</li><li>Si l'œdème progresse : <b>adrénaline</b> 0,3 mg en sous-cutané ou 0,5 mg en nébulisation.</li><li>En l'absence de réponse : <b>icatibant 30 mg</b> en sous-cutané, renouvelable à 6 heures, 3 injections au maximum par 24 heures.</li></ul></div>
+<div class="card"><h2>Saignement extracrânien</h2><ul><li>Compression si le site est accessible, arrêt de la perfusion si le saignement est important.</li><li>Même bilan d'hémostase, transfusion selon la tolérance.</li></ul></div>
+<p class="note">D'après les recommandations AHA/ASA (niveau de preuve faible, avis d'experts) et le RCP de l'Actilyse. Le protocole du service prime.</p>`},
+
+{id:'mimics',n:'Diagnostics différentiels',d:"Ce qui ressemble à un AVC sans en être un",type:'ref',
+ html:`<div class="card"><h2>En faveur d'un AVC</h2><ul><li>Début brutal, déficit maximal d'emblée ou en quelques minutes.</li><li>Symptômes négatifs : perte de force, de sensibilité, de vision, de langage.</li><li>Déficit systématisé à un territoire artériel.</li></ul></div>
+<div class="card"><h2>Les pièges les plus fréquents</h2><ul><li><b>Hypoglycémie</b> : glycémie capillaire à chaque alerte.</li><li><b>Crise épileptique et déficit post-critique</b> : clonies au début, perte de connaissance, morsure de langue, confusion, déficit qui régresse.</li><li><b>Migraine avec aura</b> : marche progressive sur 5 à 20 minutes, symptômes positifs (scintillements, fourmillements) qui se succèdent, puis céphalée.</li><li><b>Trouble neurologique fonctionnel</b> : signe de Hoover, déficit variable ou incohérent.</li><li><b>Vertige périphérique</b> : voir <a href="#hints">HINTS</a>.</li><li><b>Paralysie faciale périphérique</b> : le front est atteint, le signe de Charles Bell est présent.</li><li><b>Décompensation d'une ancienne séquelle</b> par une infection, un trouble métabolique ou un médicament.</li><li><b>Encéphalopathie</b> hypertensive, métabolique ou septique. Hématome sous-dural. Tumeur.</li><li><b>Ictus amnésique</b> : oubli à mesure isolé, questions répétées, examen normal.</li></ul></div>
+<p class="note">Aide au tri : <a href="#rosier">ROSIER</a>. En cas de doute raisonnable sur un déficit invalidant dans les délais, le doute ne doit pas retarder l'imagerie.</p>`},
+
+{id:'hsa',n:'Hémorragie méningée',d:"Règle d'Ottawa, WFNS, Fisher modifié, premiers gestes",type:'ref',
+ html:`<div class="card"><h2>Règle d'Ottawa</h2><p>Céphalée non traumatique, maximale en moins d'une heure, examen neurologique normal, à partir de 15 ans. Explorer si au moins un critère est présent :</p><ul><li>Âge de 40 ans ou plus.</li><li>Douleur ou raideur de la nuque.</li><li>Perte de connaissance constatée par un témoin.</li><li>Début pendant un effort.</li><li>Céphalée en coup de tonnerre, maximale d'emblée.</li><li>Flexion du cou limitée à l'examen.</li></ul></div>
+<div class="card"><h2>Diagnostic</h2><ul><li>Scanner sans injection : très sensible dans les 6 premières heures, moins ensuite.</li><li>Scanner normal et suspicion persistante : ponction lombaire, à partir de 12 heures (recherche de pigments).</li><li>Angioscanner pour chercher l'anévrisme.</li></ul></div>
+<div class="card"><h2>Gravité clinique : WFNS</h2><ul><li><b>I</b> : Glasgow 15, sans déficit moteur.</li><li><b>II</b> : Glasgow 13 ou 14, sans déficit moteur.</li><li><b>III</b> : Glasgow 13 ou 14, avec déficit moteur.</li><li><b>IV</b> : Glasgow 7 à 12.</li><li><b>V</b> : Glasgow 3 à 6.</li></ul></div>
+<div class="card"><h2>Scanner : Fisher modifié</h2><ul><li><b>0</b> : pas de sang.</li><li><b>1</b> : hémorragie fine, sans sang dans les ventricules.</li><li><b>2</b> : hémorragie fine, avec sang dans les ventricules.</li><li><b>3</b> : hémorragie épaisse, sans sang dans les ventricules.</li><li><b>4</b> : hémorragie épaisse, avec sang dans les ventricules.</li></ul><p class="small muted">Plus le grade est élevé, plus le risque de vasospasme et d'ischémie retardée augmente.</p></div>
+<div class="card"><h2>Premiers gestes</h2><ul><li>Transfert en centre avec neurochirurgie et neuroradiologie interventionnelle.</li><li>Repos au lit, antalgiques sans aspirine ni anti-inflammatoire.</li><li>Pression systolique en dessous de 160 tant que l'anévrisme n'est pas traité.</li><li>Arrêt et <a href="#reversion">réversion</a> des antithrombotiques.</li><li><b>Nimodipine 60 mg toutes les 4 heures</b> par voie orale, pendant 21 jours.</li><li>À surveiller : resaignement (surtout les 24 premières heures), hydrocéphalie, vasospasme (du 3e au 14e jour), hyponatrémie.</li></ul></div>
+<p class="note">Perry, JAMA 2013 pour la règle d'Ottawa. Grades et premiers gestes d'après les recommandations AHA/ASA 2023 et le Collège des enseignants de neurologie.</p>`},
+
+{id:'malin',n:'Infarctus malin',d:'Sylvien étendu ou cérébelleux : quand appeler le neurochirurgien',type:'ref',
+ html:`<div class="card"><h2>Infarctus sylvien malin : le repérer tôt</h2><ul><li>Occlusion de la carotide interne ou de M1, infarctus de plus de la moitié du territoire sylvien.</li><li>NIHSS supérieur à 15, avec baisse de vigilance (item 1a à 1 ou plus).</li><li>Volume en diffusion supérieur à <b>145 cm³</b>.</li><li>L'œdème est maximal entre le 2e et le 5e jour.</li></ul></div>
+<div class="card"><h2>Craniectomie décompressive</h2><ul><li>À discuter avec le neurochirurgien <b>dans les 48 heures</b>, avant les signes d'engagement.</li><li>Entre 18 et 60 ans : la mortalité est réduite de moitié et le handicap sévère diminue.</li><li>Après 60 ans : la mortalité baisse, mais la plupart des survivants gardent un handicap lourd. Décision au cas par cas, avec les proches.</li></ul></div>
+<div class="card"><h2>En attendant</h2><ul><li>Tête à 30°, normoxie, normocapnie, normothermie, natrémie normale.</li><li>Surveillance rapprochée de la vigilance et des pupilles.</li><li>Osmothérapie en cas d'aggravation, selon le protocole.</li></ul></div>
+<div class="card"><h2>Infarctus cérébelleux œdémateux</h2><ul><li>Risque de compression du tronc cérébral et d'hydrocéphalie, surtout les premiers jours.</li><li>Alerte : baisse de vigilance, céphalées, vomissements, paralysie oculomotrice nouvelle.</li><li>Avis neurochirurgical en urgence : dérivation ventriculaire externe ou craniectomie sous-occipitale.</li></ul></div>
+<p class="note">Analyse groupée des essais DECIMAL, DESTINY et HAMLET (Vahedi, Lancet Neurology 2007) et essai DESTINY II.</p>`},
+
+{id:'tvc',n:'Thrombose veineuse cérébrale',d:'Y penser, la confirmer, la traiter',type:'ref',
+ html:`<div class="card"><h2>Y penser devant</h2><ul><li>Céphalées inhabituelles, progressives ou brutales, parfois isolées.</li><li>Crises épileptiques, déficit focal fluctuant ou à bascule, œdème papillaire.</li><li>Terrain : femme jeune, contraception œstroprogestative, grossesse et post-partum, thrombophilie, cancer, infection ORL, maladie inflammatoire.</li></ul></div>
+<div class="card"><h2>Imagerie</h2><ul><li>IRM avec T2* et angio-IRM veineuse, ou angioscanner veineux.</li><li>Thrombus visible dans un sinus ou une veine.</li><li>Infarctus veineux souvent hémorragique, qui ne respecte pas un territoire artériel.</li></ul></div>
+<div class="card"><h2>Traitement</h2><ul><li><b>Héparine à dose curative</b> dès le diagnostic, de préférence de bas poids moléculaire, <b>même s'il existe une lésion hémorragique</b>.</li><li>Relais par anticoagulant oral pendant 3 à 12 mois selon la cause : AVK, ou anticoagulant direct dans les recommandations plus récentes (dabigatran étudié dans RE-SPECT CVT).</li><li>Pas de corticoïdes ni d'acétazolamide.</li><li>Traitement des crises. Prise en charge de l'hypertension intracrânienne.</li><li>Aggravation malgré le traitement : discuter un geste endovasculaire ou une craniectomie.</li></ul></div>
+<div class="card"><h2>Bilan de la cause</h2><ul><li>Cause locale (infection ORL, tumeur), contraception, grossesse.</li><li>Thrombophilie et cancer : pas de recherche systématique selon l'ESO, à orienter par le contexte.</li><li>Après une thrombose veineuse cérébrale : éviter définitivement les œstroprogestatifs.</li></ul></div>
+<p class="note">Recommandations ESO 2017, actualisées par la recommandation germanophone de 2024.</p>`},
+
+{id:'eme',n:'État de mal épileptique',d:'Paliers et doses selon le poids',type:'calc',
+ inputs:[{id:'p',l:'Poids',u:'kg'}],
+ fn:v=>{ if(!(v.p>=30&&v.p<=250)) return null;
+  const r1=x=>(Math.round(x*10)/10).toString().replace('.',','), r0=x=>String(Math.round(x/50)*50);
+  const clo=0.015*v.p, mid=Math.min(0.15*v.p,10), vpa=Math.min(40*v.p,3000), fos=Math.min(20*v.p,1500), lev=Math.min(60*v.p,4500), pb=15*v.p;
+  return {v:r1(clo)+' mg',t:'clonazépam IV, première ligne',
+   html:`<ul><li><b>Première ligne</b> : clonazépam <b>${r1(clo)} mg</b> en IV directe (0,015 mg/kg)${v.p>70?'. Au-delà de 1 mg, vérifier le plafond par injection du protocole du service':''}. Sans voie veineuse : midazolam <b>${r1(mid)} mg</b> en intramusculaire (0,15 mg/kg, maximum 10 mg).</li><li><b>Crise persistante à 5 minutes</b> : une deuxième dose identique.</li><li><b>Crise persistante 5 minutes après la deuxième dose</b>, un médicament de deuxième ligne au choix :<ul><li>lévétiracétam <b>${r0(lev)} mg</b> en 10 minutes (60 mg/kg, maximum 4 500 mg) ;</li><li>valproate <b>${r0(vpa)} mg</b> en 15 minutes (40 mg/kg, maximum 3 g), sauf femme en âge de procréer ou maladie du foie ;</li><li>fosphénytoïne <b>${r0(fos)} mg</b> d'équivalent phénytoïne (20 mg/kg, maximum 1 500 mg), sous scope, sauf trouble de conduction ;</li><li>phénobarbital <b>${r0(pb)} mg</b> (15 mg/kg).</li></ul></li><li><b>Crise persistante 30 minutes après le début de la deuxième ligne</b> : état de mal réfractaire, réanimation et anesthésie générale.</li></ul>`,
+   copy:`État de mal épileptique, ${r1(v.p)} kg : clonazépam ${r1(clo)} mg IV, à répéter une fois à 5 minutes. Deuxième ligne : lévétiracétam ${r0(lev)} mg, ou valproate ${r0(vpa)} mg, ou fosphénytoïne ${r0(fos)} mg EP, ou phénobarbital ${r0(pb)} mg.`}; },
+ note:"État de mal tonico-clonique généralisé : crise de plus de 5 minutes, ou crises répétées sans reprise de conscience. En parallèle : position latérale de sécurité, oxygène, glycémie capillaire, voie veineuse. Doses de première ligne : recommandations SRLF et SFMU 2018. Plafonds de deuxième ligne : essai ESETT et recommandations internationales."},
+
+{id:'cam',n:'Confusion : CAM',d:'Quatre critères pour retenir un syndrome confusionnel',type:'score',unit:'critère(s)',
+ items:[yn('Début aigu et évolution fluctuante',1,'Changement par rapport à l\'état habituel, variable dans la journée'),yn("Trouble de l'attention",1,'Distractible, ne suit pas la conversation, ne peut pas compter à rebours'),yn('Pensée désorganisée',1,'Propos incohérents, passage du coq à l\'âne'),yn('Vigilance altérée',1,'Hypervigilant, somnolent, stuporeux')],
+ interp:t=>['',''],
+ verdict:s=>(s[0]===1&&s[1]===1&&(s[2]===1||s[3]===1))?['Syndrome confusionnel probable : chercher la cause','crit']:['Critères non réunis','ok'],
+ note:"Il faut les deux premiers critères, plus le troisième ou le quatrième. Causes à chercher : infection, globe vésical, fécalome, douleur, médicament ou sevrage, trouble métabolique, état de mal non convulsif. Une aphasie de Wernicke n'est pas une confusion."},
+
+{id:'guss',n:'Test de déglutition GUSS',d:'En quatre étapes, de 0 à 20',type:'score',max:20,
+ items:[
+  {l:'Étape 1 : vigilance',h:'Éveillé pendant au moins 15 minutes',d:-1,o:[['Oui',1],['Non',0]]},
+  {l:'Étape 1 : toux ou raclement de gorge volontaire',h:'Deux fois de suite',d:-1,o:[['Oui',1],['Non',0]]},
+  {l:'Étape 1 : déglutition de la salive réussie',d:-1,o:[['Oui',1],['Non',0]]},
+  {l:'Étape 1 : bavage',d:-1,o:[['Non',1],['Oui',0]]},
+  {l:'Étape 1 : modification de la voix',h:'Rauque, gargouillante, voilée, faible',d:-1,o:[['Non',1],['Oui',0]]},
+  ...[['Étape 2, semi-solide','Seulement si l\'étape 1 est à 5. Eau épaissie en crème : une demi-cuillère à café, puis 5 autres'],['Étape 3, liquide','Seulement si l\'étape 2 est à 5. Eau : 3, 5, 10, 20 puis 50 mL'],['Étape 4, solide','Seulement si l\'étape 3 est à 5. Petit morceau de pain sans croûte']].flatMap(([p,h])=>[
+   {l:p+' : déglutition',h:h,d:-1,o:[['Réussie',2],['Retardée (plus de 2 secondes, 10 pour le solide)',1],['Impossible',0]]},
+   {l:p+' : toux involontaire',h:'Avant, pendant ou après, jusqu\'à 3 minutes',d:-1,o:[['Non',1],['Oui',0]]},
+   {l:p+' : bavage',d:-1,o:[['Non',1],['Oui',0]]},
+   {l:p+' : modification de la voix',h:'Faire dire « oh » avant et après',d:-1,o:[['Non',1],['Oui',0]]}])
+ ],
+ calc:function(s){ let tot=0, miss=0; for(const idx of [[0,1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]]){ const m=idx.filter(i=>s[i]<0).length; if(m){ miss=m; break; } const sum=idx.reduce((a,i)=>a+this.items[i].o[s[i]][1],0); tot+=sum; if(sum<5) break; } return {tot,miss}; },
+ interp:t=>t>=20?['Pas de dysphagie : alimentation normale, premier repas sous surveillance','ok']:t>=15?['Dysphagie légère : texture mixée ou molle, liquides par petites gorgées, avis orthophonique','warn']:t>=10?['Dysphagie modérée : texture lisse, liquides épaissis, médicaments écrasés, avis orthophonique','warn']:['Dysphagie sévère : rien par la bouche, sonde nasogastrique à discuter, avis orthophonique','crit'],
+ copy:function(t,s,tot){ return 'Test de déglutition GUSS : '+tot+'/20. '+t.interp(tot)[0]; },
+ note:"Chaque étape doit atteindre 5 points pour passer à la suivante : le test s'arrête à la première étape incomplète, et les étapes suivantes ne comptent pas. Trapl et al., Stroke 2007."},
+
+{id:'jeune',n:'Bilan du sujet jeune',d:'Infarctus avant 55 ans : que demander',type:'ref',
+ html:`<div class="card"><h2>Première ligne, pour tous</h2><ul><li>IRM cérébrale et imagerie des artères du cou et du crâne, avec séquence T1 en saturation de graisse si dissection suspectée.</li><li>ECG, télémétrie.</li><li>Échographie cardiaque transthoracique.</li><li>NFS, plaquettes, hémostase, ionogramme, créatinine, CRP, bilan lipidique, glycémie et HbA1c.</li></ul></div>
+<div class="card"><h2>Deuxième ligne, si rien n'est trouvé</h2><ul><li>Échographie transœsophagienne avec épreuve de contraste, ou Doppler transcrânien avec bulles : foramen ovale perméable, anévrisme du septum.</li><li>Holter ECG prolongé.</li><li>Anticorps antiphospholipides : anticoagulant circulant, anticardiolipine, anti-β2-glycoprotéine 1, à recontrôler à 12 semaines.</li><li>Homocystéine.</li><li>Électrophorèse de l'hémoglobine : drépanocytose.</li><li>Sérologies VIH, syphilis, hépatites B et C.</li><li>Recherche de toxiques urinaires. β-hCG.</li></ul></div>
+<div class="card"><h2>Selon l'orientation</h2><ul><li><b>Foramen ovale perméable ou thrombose veineuse</b> : protéine C, protéine S, antithrombine, résistance à la protéine C activée.</li><li><b>Signes généraux, atteinte de plusieurs organes</b> : anticorps antinucléaires, ANCA, ponction lombaire, imagerie de la paroi artérielle.</li><li><b>Histoire familiale, leucopathie</b> : génétique NOTCH3 (CADASIL), alpha-galactosidase A (Fabry).</li><li><b>Altération de l'état général</b> : recherche d'un cancer.</li></ul></div>
+<p class="note">Liste pédagogique rédigée de mémoire, alignée sur le bilan biologique de la trame du service. Probabilité d'un lien avec le foramen ovale : <a href="#rope">RoPE</a>.</p>`},
+
+{id:'prevention',n:'Prévention secondaire',d:"Cibles, carotide, foramen ovale, conduite automobile",type:'ref',
+ html:`<div class="card"><h2>Cibles</h2><ul><li><b>Pression artérielle</b> : en dessous de 140/90 (HAS), en visant moins de 130/80 si c'est bien toléré (ESO 2022).</li><li><b>LDL-cholestérol</b> : en dessous de 0,55 g/L dans la trame du service. Statine à forte dose après un infarctus athéromateux.</li><li><b>Diabète</b> : HbA1c à 8 % ou moins les 6 premiers mois, puis 7 % ou moins (HAS).</li><li>Sevrage du tabac, réduction de l'alcool, activité physique, dépistage des apnées du sommeil.</li></ul></div>
+<div class="card"><h2>Antithrombotique</h2><ul><li>Cause non cardio-embolique : un antiagrégant au long cours, après une éventuelle <a href="#dapt">bithérapie initiale</a>.</li><li>Fibrillation atriale : anticoagulant oral, voir <a href="#reprise">le délai de reprise</a>.</li></ul></div>
+<div class="card"><h2>Sténose carotidienne symptomatique</h2><ul><li>Sténose de <b>70 à 99 %</b> (NASCET) : endartériectomie.</li><li>Sténose de 50 à 69 % : chirurgie possible selon le patient et l'accident.</li><li>En dessous de 50 % : pas de chirurgie.</li><li>Le bénéfice est le plus net quand le geste est fait dans les <b>2 semaines</b> qui suivent l'accident.</li></ul></div>
+<div class="card"><h2>Foramen ovale perméable</h2><p>Fermeture à discuter en réunion neuro-cardiologique si tous les critères sont réunis :</p><ul><li>Âge de 16 à 60 ans.</li><li>Infarctus cérébral récent (6 mois ou moins), sans autre cause.</li><li>Foramen associé à un anévrisme du septum de plus de 10 mm, ou à un shunt de plus de 20 microbulles.</li></ul></div>
+<div class="card"><h2>À la sortie</h2><ul><li>Conduite automobile contre-indiquée temporairement, reprise après avis d'un médecin agréé.</li><li>Consultation post-AVC entre 2 et 6 mois.</li><li>Rappel des signes d'alerte et de l'appel au 15.</li></ul></div>
+<p class="note">HAS, prévention vasculaire après un infarctus cérébral ou un AIT (2014, actualisée en 2018). Consensus SFNV et SFC 2019 pour le foramen ovale. Trame du service pour les cibles.</p>`},
+
+{id:'syndromes',n:'Syndromes topographiques',d:"Localiser l'infarctus à l'examen",type:'ref',
+ html:`<div class="card"><h2>Artère cérébrale moyenne (sylvienne)</h2><ul><li><b>Superficiel</b> : déficit moteur et sensitif à prédominance brachio-faciale, hémianopsie latérale homonyme.</li><li>Hémisphère majeur : aphasie (non fluente si la lésion est antérieure, fluente si elle est postérieure), apraxie.</li><li>Hémisphère mineur : négligence, anosognosie, hémiasomatognosie.</li><li><b>Profond</b> : hémiplégie massive et proportionnelle (capsule interne).</li><li><b>Total</b> : les deux à la fois, avec déviation de la tête et des yeux vers la lésion et troubles de la vigilance.</li></ul></div>
+<div class="card"><h2>Artère cérébrale antérieure</h2><ul><li>Déficit moteur et sensitif à prédominance crurale.</li><li>Syndrome frontal : apathie, grasping. Mutisme akinétique si l'atteinte est bilatérale.</li></ul></div>
+<div class="card"><h2>Artère cérébrale postérieure</h2><ul><li><b>Superficiel</b> : hémianopsie latérale homonyme controlatérale. Alexie et agnosie visuelle à gauche, prosopagnosie à droite. Cécité corticale si bilatéral.</li><li><b>Profond (thalamus)</b> : hypoesthésie de tout l'hémicorps controlatéral, douleurs secondaires.</li></ul></div>
+<div class="card"><h2>Tronc cérébral et cervelet</h2><ul><li><b>Syndrome alterne</b> : nerf crânien du côté de la lésion, voie longue du côté opposé.</li><li><b>Wallenberg</b> (latéro-bulbaire) : du côté de la lésion, Claude Bernard-Horner, syndrome cérébelleux, hypoesthésie de la face, vertige et nystagmus, troubles de la déglutition et de la voix. Du côté opposé, anesthésie à la douleur et à la chaleur de l'hémicorps. Pas de déficit moteur.</li><li><b>Tronc basilaire</b> : coma, atteinte motrice bilatérale. Locked-in : quadriplégie, mutisme, seuls les mouvements verticaux des yeux persistent.</li><li><b>Cervelet</b> : syndrome cérébelleux du côté de la lésion, vertiges, vomissements. Attention à l'<a href="#malin">œdème</a>.</li></ul></div>
+<div class="card"><h2>Syndromes lacunaires</h2><ul><li>Hémiplégie motrice pure : capsule interne, pont.</li><li>Hémianesthésie pure : thalamus.</li><li>Dysarthrie et main malhabile : pont.</li><li>Hémiparésie ataxique : pont, couronne rayonnante.</li><li>Aucun signe cortical : ni aphasie, ni négligence, ni hémianopsie.</li></ul></div>
+<p class="note">D'après le Collège des enseignants de neurologie, rédigé de mémoire.</p>`},
+
+{id:'imagerie',n:"Lire l'imagerie",d:'Scanner et IRM à la phase aiguë',type:'ref',
+ html:`<div class="card"><h2>Scanner sans injection</h2><ul><li>Hématome : hyperdensité spontanée.</li><li>Signes précoces d'ischémie : effacement du noyau lenticulaire et du ruban insulaire, perte de la différenciation entre substance grise et blanche, effacement des sillons.</li><li>Artère hyperdense : thrombus visible.</li><li>Étendue : <a href="#aspects">ASPECTS</a>.</li></ul></div>
+<div class="card"><h2>IRM, séquence par séquence</h2><ul><li><b>Diffusion</b> : hypersignal en quelques minutes, avec baisse de l'ADC. C'est l'infarctus récent.</li><li><b>FLAIR</b> : devient positif après quelques heures. Diffusion positive et FLAIR négatif : infarctus probablement de moins de 4 h 30.</li><li><b>T2* ou SWI</b> : sang en hyposignal, thrombus dans l'artère, microsaignements.</li><li><b>TOF</b> : occlusion ou sténose intracrânienne.</li><li><b>Perfusion</b> : zone hypoperfusée plus large que la lésion en diffusion, c'est la pénombre à sauver.</li><li><b>T1 en saturation de graisse</b> : hématome de paroi d'une dissection.</li></ul></div>
+<div class="card"><h2>Pièges</h2><ul><li>Diffusion parfois négative au début dans la fosse postérieure et pour les petits infarctus.</li><li>Hypersignal en diffusion sans infarctus : crise prolongée, hypoglycémie, abcès.</li><li>Vérifier l'ADC : un hypersignal en diffusion sans baisse de l'ADC peut être un simple effet T2.</li></ul></div>
+<p class="note">Fiche pédagogique rédigée de mémoire.</p>`},
+{id:'calcium',g:'calc',n:'Calcium corrigé',d:"Selon l'albumine",type:'calc',
+ inputs:[{id:'ca',l:'Calcium',u:'mmol/L'},{id:'alb',l:'Albumine',u:'g/L'}],
+ fn:v=>{ if(!(v.ca>0&&v.alb>0)) return null; const x=v.ca+0.025*(40-v.alb), s=x.toFixed(2).replace('.',',');
+  return {v:s+' mmol/L',t:x<2.2?'Hypocalcémie':x>2.6?'Hypercalcémie':'Dans les normes',lvl:(x<2.2||x>2.6)?'warn':'ok',copy:'Calcium corrigé : '+s+' mmol/L'}; }},
+
+{id:'natremie',g:'calc',n:'Natrémie corrigée',d:'Selon la glycémie, avec conversion',type:'calc',
+ inputs:[{id:'na',l:'Sodium',u:'mmol/L'},{id:'g',l:'Glycémie',u:'g/L'}],
+ fn:v=>{ if(!(v.na>0&&v.g>0)) return null; const x=v.na+1.6*(v.g-1), s=(Math.round(x*10)/10).toString().replace('.',','), mm=(v.g*5.55).toFixed(1).replace('.',',');
+  return {v:s+' mmol/L',t:'Glycémie : '+mm+' mmol/L',copy:'Natrémie corrigée : '+s+' mmol/L (glycémie '+mm+' mmol/L)'}; },
+ note:"Formule de Katz : 1,6 mmol/L de sodium par g/L de glycémie au-dessus de 1 g/L."}
+];
+
+const LAYOUT=[
+ ['garde','Pendant la garde','#1FA2C4',['carnet','arbre','annuaire']],
+ ['alerte','Alerte thrombolyse','#D8404F',['alerte','entree','nihss','thrombolyse','dose','ta','aspects','thrombectomie','complications']],
+ ['reco','Reconnaître et trier','#E0871B',['befast','rosier','race','hints','mimics']],
+ ['ait','AIT et AVC mineur','#C29A12',['abcd2','dapt']],
+ ['hemo','Hématome et hémorragie méningée','#9A48C4',['ich','abc2','glasgow','reversion','hsa']],
+ ['urg','Autres urgences','#D2527F',['malin','tvc','eme','cam']],
+ ['lit','Au lit du patient','#17988A',['mrc','guss','a2ds2','mrs']],
+ ['fa','Fibrillation atriale','#2D82D8',['chadsvasc','hasbled','reprise','cockcroft']],
+ ['etio','Étiologie et prévention','#4A5DE2',['ascod','causes-infarctus','causes-hematome','jeune','rope','prevention']],
+ ['theorie','Théorie','#6C7DA6',['syndromes','imagerie']],
+ ['calc','Calculs','#7A8499',['calcium','natremie']]
+];
+const ORDER=LAYOUT.flatMap(l=>l[3]);
+TOOLS.forEach(t=>{ const l=LAYOUT.find(x=>x[3].includes(t.id)); t.g=l?l[0]:'calc'; });
+TOOLS.sort((a,b)=>ORDER.indexOf(a.id)-ORDER.indexOf(b.id));
+const GROUPS=LAYOUT;
+function defaults(t){ return t.items.map(i=>i.d??0); }
+function score(t,s){ if(t.calc) return t.calc(s); let miss=0,tot=t.base||0; t.items.forEach((it,i)=>{ if(s[i]<0) miss++; else tot+=it.o[s[i]][1]; }); return {tot,miss}; }
+function copyText(t,s,tot){
+  if(t.copy) return t.copy(t,s,tot);
+  const lines=t.items.map((it,i)=>s[i]<0?null:it.yn?(s[i]===1?'- '+it.l:null):'- '+it.l+' : '+it.o[s[i]][0]).filter(Boolean);
+  return t.n+' : '+tot+(t.max&&!t.unit?'/'+t.max:'')+' ('+(t.verdict?t.verdict(s):t.interp(tot))[0]+')'+(lines.length?'\n'+lines.join('\n'):'');
+}
+function railPos(h){ const k=[0,4.5,6,9,24]; if(h>=24) return 100; for(let i=0;i<4;i++) if(h<k[i+1]) return (i+(h-k[i])/(k[i+1]-k[i]))*25; return 100; }
+
+const FORM=[
+ {t:'Patient',f:[
+  {k:'age',l:'Âge',in:'num',u:'ans'},{k:'sexe',l:'Sexe',c:['Homme','Femme']},{k:'lat',l:'Latéralité',c:['Droitier','Gaucher']},
+  {k:'mrs',l:'Rankin antérieur',c:['0','1','2','3','4','5']},
+  {k:'poids',l:'Poids',in:'num',u:'kg'},
+  {k:'motif',l:"Motif d'hospitalisation",in:'text'}]},
+ {t:'Mode de vie',f:[
+  {k:'vie',l:'Lieu de vie',o:1,c:['Domicile, seul','Domicile, en couple','Domicile, en famille','EHPAD']},
+  {k:'aides',o:1,l:'Aides à domicile',c:['Aucune','Infirmière','Aide ménagère','Auxiliaire de vie']},
+  {k:'prof',l:'Profession',in:'text'},
+  {k:'mt',l:'Médecin traitant',in:'text'},
+  {k:'proche',l:'Proche à prévenir (lien, nom)',in:'text'},
+  {k:'tel',l:'Téléphone du proche',in:'text'}]},
+ {t:'Début des symptômes',f:[
+  {k:'h0',l:'Heure',in:'time'},
+  {k:'h0t',l:"Cette heure correspond à",c:['Début constaté','Dernière fois vu normal','Découverte au réveil']},
+  {k:'inst',l:'Installation',c:['Brutale','Progressive','Fluctuante']},
+  {k:'sympt',l:'Symptômes',o:1,m:['Déficit moteur','Paralysie faciale centrale','Trouble sensitif','Hémianopsie latérale homonyme','Trouble du langage','Dysarthrie','Trouble visuel','Vertige ou trouble de l\'équilibre','Céphalée','Trouble de la vigilance','Crise convulsive au début']}]},
+ {t:'Antécédents',f:[
+  {k:'fdr',o:1,l:'Facteurs de risque et antécédents vasculaires',m:['Hypertension artérielle','Diabète','Dyslipidémie','Tabac actif','Tabac sevré','Alcool','Fibrillation atriale','Coronaropathie','AVC ou AIT','Apnées du sommeil','Aucun connu']},
+  {k:'atcd',l:'Autres antécédents',in:'text'}]},
+ {t:'Traitement habituel',f:[
+  {k:'aco',o:1,l:'Anticoagulant',c:['Aucun','AVK','Apixaban','Rivaroxaban','Dabigatran','Héparine curative']},
+  {k:'acoh',l:'Dernière prise',in:'text'},
+  {k:'aap',o:1,l:'Antiagrégant',c:['Aucun','Aspirine','Clopidogrel','Bithérapie']},
+  {k:'ttt',l:'Autres traitements',in:'text'}]},
+ {t:"Examen à l'entrée",f:[
+  {k:'ta',l:'Pression artérielle',in:'text',u:'mmHg'},{k:'fc',l:'Fréquence cardiaque',in:'num',u:'bpm'},
+  {k:'spo2',l:'SpO2',in:'num',u:'%'},{k:'temp',l:'Température',in:'num',u:'°C'},{k:'gly',l:'Glycémie capillaire',in:'num',u:'g/L'}]},
+ {t:'Imagerie',f:[
+  {k:'img',o:1,l:'Examen',c:['IRM cérébrale','Scanner et angioscanner']},
+  {k:'res',o:1,l:'Résultat',c:['Infarctus récent','Hématome','Pas de lésion visible']},
+  {k:'terr',l:'Territoire ou siège',in:'text'},
+  {k:'occ',o:1,l:'Occlusion artérielle',c:['Aucune','Carotide interne','M1','M2','Tronc basilaire','Autre']},
+  {k:'asp',l:'ASPECTS',in:'num'},
+  {k:'flair',l:'Lésion visible en FLAIR',c:['Oui','Non','Non applicable']}]},
+ {t:'Décision',f:[
+  {k:'ci',l:'Contre-indication à la thrombolyse',c:['Aucune retrouvée','Présente']},
+  {k:'cit',l:'Laquelle',in:'text'},
+  {k:'tiv',l:'Thrombolyse',c:['Métalyse','Actilyse','Non']},
+  {k:'h1',l:'Heure du bolus',in:'time'},
+  {k:'non',o:1,l:'Si pas de thrombolyse, pourquoi',c:['Hors délai','Lésion visible en FLAIR','Déficit mineur non invalidant','Contre-indication','Hématome','Diagnostic différentiel']},
+  {k:'tm',l:'Thrombectomie',c:['Oui','Non']},
+  {k:'aapd',o:1,l:'Antiagrégant débuté',c:['Aspégic 250 mg IV','Aspégic 250 mg IV et Plavix 300 mg','Non']}]}
+];
+const SIDED={'Déficit moteur':'m','Paralysie faciale centrale':'f','Trouble sensitif':'m','Hémianopsie latérale homonyme':'f'};
+const BIO=`À LA BIOLOGIE CE JOUR
+
+NFS
+Leucocytes : G/L
+Hb : g/dL
+VGM : u3
+Plaquettes : G/L
+
+Coagulation
+TP : %
+TCA :
+
+Ionogramme sanguin
+Sodium : mmol/L
+Potassium : mmol/L
+Calcium : mmol/L
+Phosphore : mmol/L
+Magnésium : mmol/L
+
+Fonction rénale
+Urée : mmol/L
+Créatinine : umol/L
+DFG : ml/min
+
+Bilan hépatique
+Bilirubine totale : umol/L
+PAL : UI/L
+GGT : UI/L
+ASAT : UI/L
+ALAT : UI/L
+Lipase : UI/L
+
+Bilan lipidique
+Cholestérol total : mmol/L
+TG : mmol/L
+HDL : mmol/L
+LDL : g/L
+
+Bilan cardiaque
+Troponine : ng/mL
+BNP : ng/L
+Myoglobine : µg/L
+
+Autres
+CRP : mg/L
+LDH : UI/L
+CPK : UI/L
+Albumine : g/L
+Homocystéine :
+HbA1c : %
+Protéine C, S, ATIII, RPCA :
+EPP :
+
+Sérologies sanguines
+VIH :
+HTLV :
+Syphilis :
+VHA :
+VHB :
+VHC :
+
+Bilan thyroïdien
+TSH :
+T3 :
+T4 :`;
+function motEntree(F,nihssTxt){
+  const has=k=>F[k]!==undefined&&F[k]!==''&&!(Array.isArray(F[k])&&!F[k].length);
+  const one=(k,x)=>x==='Autre'?(F[k+'_o']||'autre : [ ]'):SIDED[x]?x+' '+(F['side_'+x]?(F['side_'+x]==='D'?(SIDED[x]==='f'?'droite':'droit'):'gauche'):'[droit / gauche]'):String(x);
+  const g=k=>has(k)?(Array.isArray(F[k])?F[k].map(x=>one(k,x)).join(', '):one(k,F[k])):'[ ]';
+  const low=k=>g(k).split(', ').map(x=>/^[A-ZÀ-Ý][A-Z0-9]/.test(x)?x:x.charAt(0).toLowerCase()+x.slice(1)).join(', ');
+  const fem=F.sexe==='Femme', num=x=>(Math.round(x*10)/10).toString().replace('.',',');
+  const fz=w=>fem?w.replace('droitier','droitière').replace('gaucher','gauchère').replace('seul','seule'):w;
+  const fdr=F.fdr||[], f=x=>fdr.includes(x), hm=s=>s.replace(':',' h ');
+  const p=parseFloat(String(F.poids||'').replace(',','.')), lysed=F.tiv==='Métalyse'||F.tiv==='Actilyse';
+  const L=[];
+  L.push('Externe : [ ] – Interne : FRATI David');
+  L.push((has('sexe')?(fem?'Patiente':'Patient'):'Patient(e)')+' de '+g('age')+' ans');
+  L.push('',"MOTIF D'HOSPITALISATION");
+  L.push('- '+(has('motif')?g('motif'):'Alerte thrombolyse pour '+low('sympt')));
+  L.push('','ANTÉCÉDENTS');
+  L.push('- Facteurs de risque et antécédents vasculaires : '+low('fdr'));
+  L.push('- Autres antécédents : '+g('atcd'));
+  L.push('',"TRAITEMENT À L'ENTRÉE");
+  L.push('- Anticoagulant : '+low('aco')+(has('aco')&&F.aco!=='Aucun'?', dernière prise : '+g('acoh'):''));
+  L.push('- Antiagrégant : '+low('aap'));
+  L.push('- Autres : '+g('ttt'));
+  L.push('','MODE DE VIE');
+  L.push('- Latéralité : '+fz(low('lat')));
+  L.push('- Lieu de vie : '+fz(low('vie')));
+  L.push('- Aides à domicile : '+low('aides'));
+  L.push('- Profession : '+g('prof'));
+  L.push('- Autonomie antérieure : score de Rankin modifié à '+g('mrs'));
+  L.push('- Médecin traitant : '+g('mt'));
+  L.push('- Proche à prévenir : '+g('proche')+', téléphone : '+g('tel'));
+  L.push('','HISTOIRE DE LA MALADIE');
+  const h0=hm(g('h0'));
+  L.push('- '+(F.h0t==='Dernière fois vu normal'?'Dernière fois vu normal à '+h0:F.h0t==='Découverte au réveil'?'Déficit découvert au réveil, dernière fois vu normal à '+h0:'Début des symptômes à '+h0+(has('h0t')?'':' (heure de début ou dernière fois vu normal : [ ])')));
+  L.push('- Installation : '+low('inst'));
+  L.push('- Symptômes : '+low('sympt'));
+  L.push('','EXAMEN CLINIQUE','Constantes :');
+  L.push('- TA : '+g('ta')+' mmHg','- FC : '+g('fc')+' bpm','- FR : [ ] /min','- SpO2 : '+g('spo2')+' %','- Température : '+g('temp')+' °C','- Glycémie capillaire : '+g('gly')+' g/L','- Poids : '+g('poids')+' kg');
+  L.push('',nihssTxt||'NIHSS à [ ] :');
+  L.push('','Examen général :','- Examen cardio-pulmonaire : BDC réguliers sans souffle surajouté, MV bilatéral et symétrique, eupnéique en air ambiant','- Déglutition : [test de déglutition normal / alimentation adaptée : ...]','- Position : [0° / 30° / 60° / 90° / au fauteuil]');
+  L.push('',BIO);
+  L.push('','AUTRES EXAMENS','- ECG d\'entrée : [ ]','- Télémétrie du jour : [ ]');
+  let img='- Imagerie du jour : '+g('img')+' : '+low('res')+(has('terr')?', '+g('terr'):'')+'. Occlusion artérielle : '+low('occ');
+  if(has('asp')) img+='. ASPECTS : '+g('asp');
+  if(has('flair')&&F.flair!=='Non applicable') img+='. Lésion '+(F.flair==='Oui'?'visible':'non visible')+' en FLAIR';
+  L.push(img,'- Autres résultats reçus : [ ]');
+  L.push('','SUR LE PLAN NEUROLOGIQUE','- [ ]','- Kinésithérapie : [ ]','- Orthophonie : [ ]','- Ergothérapie : [ ]');
+  L.push('','SUR LE PLAN EXTRA-NEUROLOGIQUE',
+   '- Hémodynamique : TA objectif '+(lysed?'< 180/105 mmHg pendant 24 h':'[ ]')+', traitement [ ]',
+   '- Respiratoire : [pas d\'encombrement, air ambiant / oxygène [ ] L / suspicion de pneumopathie d\'inhalation]',
+   '- Glycémique : [glycémies dans l\'objectif / insuline selon protocole]',
+   '- Infectieux : [apyrétique, pas de point d\'appel / fièvre : point d\'appel [ ], prélèvements [ ]]',
+   '- Nutrition / hydratation : [alimentation normale / texture adaptée / sonde nasogastrique / perfusion]',
+   '- Urinaire : [mictions spontanées / rétention, bladder scan [ ] mL / sonde urinaire]',
+   '- Transit : [conservé / constipation]','- Cutané : [pas d\'escarre / précisions]',
+   '- Thromboembolique : [pas de signe de thrombose veineuse profonde]','- Douleur / thymie / sommeil : [ ]');
+  L.push('','SUR LE PLAN ÉTIOLOGIQUE','- Hypothèses étiologiques : [ ]');
+  L.push('','SUR LE PLAN THÉRAPEUTIQUE');
+  L.push('- Contre-indication à la thrombolyse : '+(F.ci==='Présente'?g('cit'):low('ci')));
+  if(lysed){
+    let dose='';
+    if(p>0) dose=F.tiv==='Métalyse'?' '+num(Math.min(0.25*p,25))+' mg en bolus (0,25 mg/kg)':' '+num(Math.min(0.9*p,90))+' mg (0,9 mg/kg) dont '+num(Math.min(0.9*p,90)*0.1)+' mg en bolus';
+    let delai='';
+    if(has('h0')&&has('h1')){ const m=s=>{const a=s.split(':');return +a[0]*60+ +a[1];}; let d=m(F.h1)-m(F.h0); if(d<0) d+=1440; delai=', soit '+Math.floor(d/60)+' h '+String(d%60).padStart(2,'0')+' après le début'; }
+    L.push('- Thrombolyse intraveineuse par '+F.tiv.toUpperCase()+dose+' à '+hm(g('h1'))+delai);
+  } else if(F.tiv==='Non') L.push("- Pas d'indication à une thrombolyse : "+low('non'));
+  else L.push('- Thrombolyse : [ ]');
+  L.push(F.tm==='Oui'?'- Thrombectomie mécanique : indication retenue, [ ]':F.tm==='Non'?"- Pas d'indication à une thrombectomie"+(F.occ==='Aucune'?" devant l'absence d'occlusion vasculaire proximale":''):'- Thrombectomie : [ ]');
+  L.push('- Antithrombotique : '+(has('aapd')?(F.aapd==='Non'?(lysed?'aucun pendant 24 h, à débuter après l\'imagerie de contrôle':'non débuté'):F.aapd.replace('Aspégic','ASPEGIC').replace('Plavix','PLAVIX')):'[ ]'));
+  L.push('- Statine : [ ]','- Antihypertenseurs : [ ]','- Antidiabétiques / insuline : [ ]','- Prévention thromboembolique : [LOVENOX 4000 UI par jour / bas de contention / non]','- Traitement habituel : [poursuivi / suspendu : ... / modifié : ...]','- Hydratation / perfusion : [ ]','- Antalgiques / symptomatiques : [ ]');
+  L.push('','SUR LE PLAN DES FACTEURS DE RISQUE CARDIOVASCULAIRE');
+  L.push('- Hypertension artérielle : '+(f('Hypertension artérielle')?'connue':'[ ]'));
+  L.push('- Dyslipidémie : '+(f('Dyslipidémie')?'connue, ':'')+'LDL [ ] g/L, objectif [ ]');
+  L.push('- Diabète : '+(f('Diabète')?'connu, ':'')+'HbA1c [ ] %');
+  L.push('- Indice de masse corporelle : [ ]');
+  L.push('- Tabac : '+(f('Tabac actif')?'actif à [ ] paquets-années':f('Tabac sevré')?'sevré':'[ ]'));
+  L.push('- Alcool : '+(f('Alcool')?'consommation déclarée, [ ]':'[ ]'));
+  L.push('- Sédentarité : [ ]');
+  L.push('- Syndrome d\'apnées du sommeil : '+(f('Apnées du sommeil')?'connu':'[connu appareillé / à dépister / non]'));
+  L.push('- Antécédents familiaux cardiovasculaires : [ ]');
+  L.push('','CONDUITE À TENIR','- Hospitalisation en USINV, surveillance scopée');
+  if(lysed) L.push('- Surveillance du NIHSS et de la TA toutes les 15 minutes pendant 2 h, toutes les 30 minutes pendant 6 h, puis toutes les heures jusqu\'à 24 h','- Pas d\'antithrombotique ni de geste invasif pendant 24 h','- Imagerie de contrôle à 24 h');
+  L.push('- Test de déglutition avant toute prise orale','- Bilan étiologique : [ ]','- Avis spécialisé : [spécialité] demandé le [ ] – réponse : [ ]','- [ ]');
+  return L.join('\n');
+}
+const MRC=[
+ ['Membres supérieurs',[
+  ["Abduction de l'épaule",'Deltoïde, C5'],['Flexion du coude','Biceps brachial, C5-C6'],['Extension du coude','Triceps brachial, C7'],
+  ['Extension du poignet','Extenseurs du carpe, C6-C7'],['Flexion du poignet','Fléchisseurs du carpe, C7-C8'],
+  ['Extension des doigts','Extenseur commun des doigts, C7'],['Flexion des doigts','Fléchisseurs des doigts, C8'],
+  ['Écartement des doigts','Interosseux dorsaux, C8-T1, nerf ulnaire'],['Abduction du pouce','Court abducteur du pouce, C8-T1, nerf médian']]],
+ ['Membres inférieurs',[
+  ['Flexion de la hanche','Psoas iliaque, L1-L3'],['Extension de la hanche','Grand fessier, L5-S2'],['Abduction de la hanche','Moyen fessier, L4-S1'],['Adduction de la hanche','Adducteurs, L2-L4'],
+  ['Extension du genou','Quadriceps, L3-L4'],['Flexion du genou','Ischio-jambiers, L5-S2'],
+  ['Flexion dorsale du pied','Tibial antérieur, L4-L5'],['Extension du gros orteil',"Long extenseur de l'hallux, L5"],
+  ['Éversion du pied','Fibulaires, L5-S1'],['Flexion plantaire du pied','Triceps sural, S1-S2']]]
+];
+const MRC_LEG=['Aucune contraction','Contraction visible, sans mouvement','Mouvement possible sans la pesanteur','Mouvement contre la pesanteur','Mouvement contre résistance, force diminuée','Force normale'];
+function mrcText(M){
+  const v=k=>M[k]===undefined?'[ ]':M[k]; let n=0; const L=['Testing moteur (MRC sur 5, droite / gauche) :'];
+  MRC.forEach(([sec,rows])=>{ L.push(sec+' :'); rows.forEach(r=>{ L.push('- '+r[0]+' ('+r[1].split(',')[0].toLowerCase()+') : '+v(n+'d')+' / '+v(n+'g')); n++; }); });
+  return L.join('\n');
+}
+
+/* ---------- Arbre décisionnel ---------- */
+const tUl=a=>'<ul>'+a.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+const tCard=(h,a)=>'<div class="card"><h2>'+h+'</h2>'+tUl(a)+'</div>';
+const T_SRC_ISCH=`<p class="note">HAS, traitements de la phase aiguë de l'AVC ischémique (octobre 2025) et guide du parcours AVC (2025). Mesures générales : HAS, prise en charge initiale de l'AVC. La décision se prend avec le neurologue senior.</p>`;
+function tGen(s){
+  const reperf=s.tiv===1||s.occ==='ant'||s.occ==='bas';
+  return tCard("Dans les premières heures en USINV",[
+   "Scope, NIHSS et constantes répétés.",
+   reperf?`Pression artérielle : sous <b>185/110</b> avant la thrombolyse, puis sous <b>180/105</b> pendant 24 h (<a href="#ta">objectifs</a>).`:`Pression artérielle : la respecter jusqu'à <b>220/120</b> (<a href="#ta">objectifs</a>).`,
+   s.tiv===1?`Antithrombotique : <b>aucun pendant 24 h</b> après la thrombolyse, puis aspirine après l'imagerie de contrôle (sauf stent posé pendant une thrombectomie).`:`Antithrombotique : aspirine <b>160 à 300 mg</b> dès que l'hémorragie est écartée (après une thrombectomie seule, selon le neuroradiologue).`,
+   "Glycémie : insuline à partir de <b>1,8 g/L</b> (10 mmol/L).",
+   "Température : paracétamol au-dessus de <b>37,5 °C</b>, et chercher la cause.",
+   "Oxygène seulement si la SpO2 passe sous 95 %.",
+   `<a href="#guss">Test de déglutition</a> avant toute prise orale. Perfusion par sérum physiologique.`,
+   "Ne pas laisser à plat strict par défaut. Fauteuil et lever dès que possible.",
+   "HBPM à dose préventive dès 24 h si le patient est immobilisé"+(s.tiv===1?", après l'imagerie de contrôle.":"."),
+   "Pas de corticoïdes, pas d'héparine à dose curative.",
+   s.tiv===1?`Surveillance après thrombolyse et conduite si aggravation : <a href="#complications">complications</a>.`:`Infarctus étendu : surveiller l'œdème (<a href="#malin">infarctus malin</a>).`,
+   `Ensuite : <a href="#causes-infarctus">bilan de la cause</a>, <a href="#prevention">prévention secondaire</a>, <a href="#entree">mot d'entrée</a>.`]);
+}
+function leafIsch(s){
+  const tmZone=s.occ==='ant'||s.occ==='bas', early=s.win==='a';
+  let tiv, tivOn=false;
+  if(s.tiv===1&&!s.late){ tivOn=true; tiv=[
+    `<b>Thrombolyse intraveineuse, sans attendre</b> : ténectéplase 0,25 mg/kg ou altéplase 0,9 mg/kg (grade A).`,
+    s.occ==='ant'?"Occlusion proximale de la circulation antérieure : la <b>ténectéplase</b> est à privilégier (grade A).":"Les deux molécules sont possibles.",
+    `<a href="#dose">Calculer la dose selon le poids</a>. Objectif : moins de 60 minutes entre l'arrivée et le bolus.`]; }
+  else if(s.tiv===1&&s.late){
+    if(tmZone) tiv=[`Thrombolyse tardive : la HAS la réserve aux patients chez qui la thrombectomie n'est <b>pas indiquée ou pas prévue</b>.`,"Si la thrombectomie est retenue : pas de thrombolyse.","Si elle n'est pas retenue : altéplase 0,9 mg/kg."];
+    else { tivOn=true; tiv=[`<b>Thrombolyse par altéplase 0,9 mg/kg</b>, sur les critères d'imagerie retenus (grade A pour le mismatch diffusion-FLAIR, grade B pour la perfusion).`,"Entre 4 h 30 et 9 h, c'est une prescription hors AMM. Pas de ténectéplase dans cette indication.",`<a href="#dose">Calculer la dose selon le poids</a>.`]; }
+  } else tiv=["<b>Pas de thrombolyse</b> : "+(s.ci?"contre-indication retenue.":s.win==='c'?"au-delà de 9 heures.":"imagerie de sélection non favorable ou indisponible.")];
+  let tm, tmOn=false;
+  if(s.occ==='ant'){
+    tmOn=true;
+    if(s.asp==='mid') tm=["Infarctus étendu, <b>ASPECTS 3 à 5</b> : la thrombectomie peut être proposée dans les 24 h si le patient a moins de 80 ans, un Rankin antérieur à 0 ou 1 et un NIHSS inférieur à 30 (grade B)."];
+    else if(s.asp==='low') tm=["<b>ASPECTS 0 à 2</b> : la thrombectomie peut être proposée jusqu'à 7 h si le patient a moins de 80 ans, un Rankin antérieur à 0 ou 1 et un NIHSS à 6 ou plus (grade C)."];
+    else if(early) tm=["<b>Thrombectomie indiquée</b> : occlusion proximale de la circulation antérieure, à moins de 6 heures."];
+    else tm=["Occlusion proximale de la circulation antérieure :","avant 6 h, thrombectomie indiquée ;","de 6 à 16 h, si les critères DAWN ou DEFUSE-3 sont réunis ;","de 16 à 24 h, si les critères DAWN sont réunis."];
+    tm.push("<b>Appeler le neuroradiologue interventionnel maintenant.</b>");
+    if(tivOn) tm.push("Thrombolyse et thrombectomie sont associées chez les patients éligibles aux deux dans les 4 h 30 (grade B). La thrombolyse ne doit pas retarder le geste.");
+  } else if(s.occ==='bas'){ tmOn=true; tm=["<b>Tronc basilaire ou artère vertébrale</b> : la thrombectomie peut être proposée jusqu'à 24 h si le Rankin antérieur est à 0 ou 1, le NIHSS à 10 ou plus, le PC-ASPECTS à 6 ou plus, sans ischémie bilatérale du pont ou du mésencéphale (grade B).","<b>Appeler le neuroradiologue interventionnel maintenant.</b>"]; }
+  else if(s.occ==='dist') tm=["Occlusion M2 ou plus distale : la fiche HAS 2025 ne la traite pas. À discuter au cas par cas avec le neuroradiologue interventionnel."];
+  else tm=["Pas d'occlusion accessible : pas de thrombectomie."];
+  const title=tivOn&&tmOn?"Thrombolyse et thrombectomie":tivOn?"Thrombolyse intraveineuse":tmOn?"Thrombectomie à discuter":"Pas de traitement de reperfusion";
+  return {title,lvl:(tivOn||tmOn)?'ok':'warn',html:tCard("Thrombolyse",tiv)+tCard("Thrombectomie",tm)+tGen(s)+T_SRC_ISCH};
+}
+const T_REV={
+ avk:["<b>AVK</b> : PPSB <b>25 UI/kg</b> et vitamine K <b>10 mg</b>, sans attendre l'INR.","Objectif : INR à 1,2 ou moins. Contrôle à 30 minutes."],
+ dabi:["<b>Dabigatran</b> : idarucizumab <b>5 g</b>. S'il manque : PPSB 50 UI/kg."],
+ xa:["<b>Anti-Xa</b> (apixaban, rivaroxaban, édoxaban) : PPSB <b>50 UI/kg</b>, sauf si la concentration est à 30 ng/mL ou moins.","Andexanet selon la disponibilité locale."],
+ hep:["<b>Héparine</b> : arrêt et protamine, dose selon l'héparine reçue."],
+ aap:["<b>Antiagrégant</b> : arrêt. Pas de transfusion de plaquettes, sauf geste neurochirurgical."],
+ none:["Pas d'antithrombotique : vérifier quand même plaquettes, TP et TCA."]};
+function leafHem(s){
+  const neuro=[];
+  if(s.grav) neuro.push("<b>Troubles de la vigilance, hydrocéphalie ou effet de masse</b> : avis neurochirurgical et réanimation en urgence. Dérivation ventriculaire externe en cas d'hydrocéphalie, évacuation de l'hématome à discuter.");
+  if(s.loc==='cb') neuro.push("<b>Hématome cérébelleux</b> : avis neurochirurgical systématique. L'évacuation se discute au-delà de 15 mL, ou devant une compression du tronc ou une hydrocéphalie.");
+  if(s.loc==='lob') neuro.push("Hématome lobaire : l'évacuation mini-invasive précoce a montré un bénéfice dans l'essai ENRICH, à confirmer. À discuter si le centre la pratique.");
+  if(!neuro.length) neuro.push("Hématome profond sans signe de gravité : traitement médical, pas de chirurgie en routine.");
+  const ta=["Objectif du service : <b>moins de 140/90</b>, à atteindre vite et à garder stable.","À débuter rapidement, surtout si les symptômes ont moins de 6 h et que la systolique est entre 150 et 220."];
+  if(s.grav) ta.push("Ici, la HAS déconseille une baisse <b>rapide</b> : hématome volumineux avec effet de masse, Glasgow inférieur à 6, lésion causale sous-jacente ou chirurgie prévue. Cible à fixer avec le réanimateur.");
+  const etio=s.loc==='prof'?["Hématome profond chez un hypertendu connu : microangiopathie hypertensive probable.","Imagerie vasculaire si le patient est jeune ou sans hypertension."]:["Angioscanner à la phase aiguë : malformation, anévrisme, thrombose veineuse.",s.loc==='lob'?"Lobaire après 55 ans : penser à l'angiopathie amyloïde (IRM avec T2*).":"IRM à distance si rien n'est trouvé."];
+  etio.push(`<a href="#causes-hematome">Causes d'un hématome</a>.`);
+  return {title:"Hématome intracérébral : les quatre gestes de la première heure",lvl:s.grav?'crit':'warn',
+   html:tCard("1. Réversion de l'antithrombotique",T_REV[s.aco||'none'].concat([`Détail : <a href="#reversion">réversion des anticoagulants</a>.`]))
+   +tCard("2. Pression artérielle",ta)
+   +tCard("3. Glycémie et température",["Corriger l'hyperglycémie et traiter la fièvre dès l'admission : avec la pression artérielle et la réversion, c'est le « bundle » qui améliore le pronostic (essai INTERACT3)."])
+   +tCard("4. Neurochirurgie",neuro)
+   +tCard("Cause à chercher",etio)
+   +tCard("Ensuite",[`Gravité : <a href="#ich">ICH score</a> et <a href="#abc2">volume ABC/2</a>. Pas de limitation des soins sur le score seul dans les 24 premières heures.`,"Scanner de contrôle à 24 h, ou tout de suite en cas d'aggravation.","Prévention des thromboses : compression pneumatique intermittente d'emblée. HBPM préventive à discuter après 24 à 48 h si l'hématome est stable.","Pas d'antiépileptique préventif, pas de corticoïdes.",`<a href="#guss">Test de déglutition</a> avant toute prise orale.`])
+   +`<p class="note">HAS, guide du parcours AVC (2025) ; ESO-EANS 2025 ; recommandations françaises 2024 sur les hémorragies sous anticoagulants. Le délai de l'HBPM préventive est donné de mémoire : à valider avec le senior.</p>`};
+}
+const TREE={
+ start:{q:"Quelle est la situation ?",o:[
+  ["Déficit focal brutal, encore présent","gestes"],
+  ["Déficit focal qui a régressé (AIT probable)","ait"],
+  ["Céphalée brutale ou inhabituelle, sans déficit","ceph"],
+  ["Vertige aigu isolé","vert"]]},
+ gestes:{q:"Avant l'imagerie, c'est fait ?",h:tUl([
+  "Heure de la dernière fois vu normal, témoin joignable.",
+  "<b>Glycémie capillaire</b> : corriger une hypoglycémie puis réévaluer.",
+  `Pression artérielle, <a href="#nihss">NIHSS</a>, poids.`,
+  "Anticoagulant : lequel, et l'heure de la dernière prise.",
+  "Autonomie antérieure.",
+  "Voie veineuse, sérum physiologique. Bilan : NFS, plaquettes, TP et INR, TCA, dosage spécifique si anticoagulant direct.",
+  "Imagerie cérébrale et vasculaire en urgence, par IRM autant que possible. Cible : moins de 25 minutes après l'arrivée."]),
+  o:[["C'est fait, l'imagerie est disponible","img"]]},
+ img:{q:"Que montre l'imagerie ?",o:[
+  ["Pas d'hémorragie : infarctus, ou imagerie normale avec déficit persistant","i_hand"],
+  ["Hématome intracérébral","h_aco"],
+  ["Hémorragie méningée","e_hsa"],
+  ["Thrombose veineuse cérébrale","e_tvc"],
+  ["Imagerie normale et doute sur le diagnostic","e_mimic"]]},
+ i_hand:{q:"Le déficit est-il handicapant ?",h:`<p class="small muted">Handicapant : il empêcherait le patient de reprendre ses activités, quel que soit le NIHSS. Exemples de la HAS : aphasie, hémianopsie latérale homonyme.</p>`,o:[
+  ["Oui","i_delai"],
+  ["Non : AVC mineur (NIHSS ≤ 5) non handicapant","i_min"]]},
+ i_min:{q:"Occlusion intracrânienne à l'imagerie vasculaire ?",o:[["Non","e_min"],["Oui","e_minocc"]]},
+ i_delai:{q:"Délai depuis la dernière fois vu normal ?",o:[
+  ["Moins de 4 h 30","i_ci",{win:'a'}],
+  ["De 4 h 30 à 9 h, heure connue","i_perf",{win:'b'}],
+  ["Heure inconnue, ou constaté au réveil","i_wake",{win:'w'}],
+  ["De 9 à 24 h","i_occ",{win:'c',tiv:0}],
+  ["Plus de 24 h","e_late"]]},
+ i_perf:{q:"Imagerie de perfusion : mismatch, avec un NIHSS à 4 ou plus ?",h:`<p class="small muted">Critères indicatifs (EXTEND) : Tmax > 6 s, nécrose < 70 mL, rapport hypoperfusion/nécrose > 1,2, mismatch > 10 mL. Sans imagerie de perfusion, la thrombolyse n'est pas conseillée : tout faire pour l'obtenir.</p>`,o:[
+  ["Oui","i_ci",{late:1}],
+  ["Non, ou perfusion indisponible","i_occ",{tiv:0}]]},
+ i_wake:{q:"Que montre l'imagerie de sélection (NIHSS à 4 ou plus) ?",o:[
+  ["IRM dans les 4 h 30 après la constatation : diffusion positive, FLAIR négatif","i_ci",{late:1}],
+  ["Perfusion : mismatch, dans les 9 h après le milieu du sommeil","i_ci",{late:1}],
+  ["Ni l'un ni l'autre","i_occ",{tiv:0}]]},
+ i_ci:{q:"Y a-t-il une contre-indication à la thrombolyse ?",h:tUl([
+  `<a href="#thrombolyse">Liste à cocher</a>.`,
+  "AVK : pas de contre-indication si l'INR est à 1,7 ou moins. Contre-indiquée si l'INR est au-dessus, ou inconnu.",
+  "Anticoagulant oral direct : la HAS ne formule pas de recommandation. Dosage spécifique et décision avec le senior.",
+  "Antiagrégant, seul ou en bithérapie : pas une contre-indication, mais le risque hémorragique augmente.",
+  "Pression artérielle au-dessus de 185/110 : la faire baisser d'abord."]),o:[
+  ["Aucune","i_occ",{tiv:1}],
+  ["Oui","i_occ",{tiv:0,ci:1}]]},
+ i_occ:{q:"Occlusion artérielle à l'imagerie vasculaire ?",o:[
+  ["Carotide interne ou M1","i_asp",{occ:'ant'}],
+  ["Tronc basilaire ou artère vertébrale","e_isch",{occ:'bas'}],
+  ["M2 ou plus distale","e_isch",{occ:'dist'}],
+  ["Aucune","e_isch",{occ:0}]]},
+ i_asp:{q:"Quelle est l'étendue de l'infarctus ?",h:`<p class="small muted"><a href="#aspects">Calculer l'ASPECTS</a>.</p>`,o:[
+  ["ASPECTS de 6 à 10","e_isch",{asp:'ok'}],
+  ["ASPECTS de 3 à 5","e_isch",{asp:'mid'}],
+  ["ASPECTS de 0 à 2","e_isch",{asp:'low'}]]},
+ e_isch:{end:leafIsch},
+ e_min:{end:{title:"AVC mineur non handicapant : pas de thrombolyse",lvl:'warn',html:
+  tCard("Décision",["La thrombolyse n'est <b>pas conseillée</b> (HAS 2025, grade B).","Hospitalisation en USINV quand même : le risque d'aggravation et de récidive est maximal les premiers jours."])
+  +tCard("Antiagrégant, dans les 24 h",["NIHSS à 3 ou moins et cause non cardio-embolique : <b>aspirine et clopidogrel</b> pendant 21 jours, puis un seul.","Sinon : un seul antiagrégant.",`Doses de charge : <a href="#dapt">bithérapie antiplaquettaire</a>.`])
+  +tGen({tiv:0})+T_SRC_ISCH}},
+ e_minocc:{end:{title:"AVC mineur non handicapant avec occlusion : à discuter",lvl:'warn',html:
+  tCard("Décision",["La thrombolyse n'est pas conseillée, mais elle est <b>discutable au cas par cas</b> (HAS 2025, grade C).","Appeler le senior et le neuroradiologue interventionnel.","Surveillance rapprochée : toute aggravation fait reprendre l'arbre comme un déficit handicapant."])
+  +tGen({tiv:0})+T_SRC_ISCH}},
+ e_late:{end:{title:"Plus de 24 heures : hors délais de reperfusion",lvl:'warn',html:
+  tCard("Décision",["Pas de thrombolyse ni de thrombectomie dans les recommandations.","Symptômes fluctuants ou occlusion du tronc basilaire : appeler le senior, la discussion reste ouverte au cas par cas."])
+  +tGen({tiv:0})+T_SRC_ISCH}},
+ h_aco:{q:"Traitement antithrombotique en cours ?",o:[
+  ["AVK","h_loc",{aco:'avk'}],["Dabigatran","h_loc",{aco:'dabi'}],["Apixaban, rivaroxaban ou édoxaban","h_loc",{aco:'xa'}],
+  ["Héparine","h_loc",{aco:'hep'}],["Antiagrégant seul","h_loc",{aco:'aap'}],["Aucun","h_loc",{aco:'none'}]]},
+ h_loc:{q:"Où siège l'hématome ?",o:[
+  ["Profond : noyaux gris, thalamus, tronc cérébral","h_grav",{loc:'prof'}],
+  ["Lobaire","h_grav",{loc:'lob'}],
+  ["Cervelet","h_grav",{loc:'cb'}]]},
+ h_grav:{q:"Signes de gravité ?",h:`<p class="small muted">Troubles de la vigilance, hydrocéphalie, effet de masse, inondation ventriculaire.</p>`,o:[
+  ["Oui","e_hem",{grav:1}],["Non","e_hem",{grav:0}]]},
+ e_hem:{end:leafHem},
+ e_hsa:{end:{title:"Hémorragie méningée",lvl:'crit',html:
+  tCard("Tout de suite",["Angioscanner à la recherche de l'anévrisme.","Appel du centre de neurochirurgie et de neuroradiologie interventionnelle pour transfert.","Repos au lit, antalgiques sans aspirine ni anti-inflammatoire.","Pression systolique sous 160 tant que l'anévrisme n'est pas traité.","Arrêt et <a href=\"#reversion\">réversion</a> des antithrombotiques.","Nimodipine 60 mg toutes les 4 heures."])
+  +`<p class="note">Grades WFNS et Fisher, surveillance : <a href="#hsa">fiche hémorragie méningée</a>.</p>`}},
+ e_tvc:{end:{title:"Thrombose veineuse cérébrale",lvl:'crit',html:
+  tCard("Traitement",["<b>Héparine à dose curative</b> dès le diagnostic, de bas poids moléculaire de préférence, <b>même s'il existe une lésion hémorragique</b>.","Crise épileptique : traitement antiépileptique.","Pas de corticoïdes ni d'acétazolamide."])
+  +tCard("Signes de gravité",["Coma, engagement, lésion avec effet de masse : réanimation et avis neurochirurgical, craniectomie décompressive à discuter.","Aggravation malgré l'anticoagulation : geste endovasculaire à discuter."])
+  +tCard("Ensuite",["Chercher la cause : infection ORL, contraception, grossesse et post-partum, cancer, thrombophilie selon le contexte.","Relais par anticoagulant oral pendant 3 à 12 mois.",`<a href="#tvc">Fiche thrombose veineuse cérébrale</a>.`])
+  +`<p class="note">ESO 2017 et recommandation germanophone 2024.</p>`}},
+ e_mimic:{end:{title:"Imagerie normale : AVC ou diagnostic différentiel ?",lvl:'warn',html:
+  tCard("Ne pas exclure l'AVC trop vite",["Un scanner normal dans les premières heures n'élimine pas un infarctus.","L'IRM de diffusion peut être négative au début, surtout dans la fosse postérieure et pour les petits infarctus.","Déficit handicapant, tableau vasculaire typique, dans les délais : reprendre l'arbre comme un infarctus."])
+  +tCard("Si le doute persiste",[`<a href="#mimics">Diagnostics différentiels</a> et score <a href="#rosier">ROSIER</a>.`,"IRM si seul un scanner a été fait.","Selon le contexte : EEG, bilan métabolique, ponction lombaire."])}},
+ ait:{q:"Une cause est-elle déjà identifiée ?",h:`<p class="small muted">Pour tous : imagerie cérébrale (IRM de préférence) et des artères en urgence, ECG, bilan dans les 24 h. Aspirine en dose de charge de 160 à 300 mg dès que l'hémorragie est écartée.</p>`,o:[
+  ["Fibrillation atriale","e_ait_fa"],
+  ["Sténose carotidienne de 50 % ou plus du côté symptomatique","e_ait_car"],
+  ["Pas encore","ait_abcd"]]},
+ ait_abcd:{q:"Le score ABCD2 est-il à 4 ou plus ?",h:`<p class="small muted"><a href="#abcd2">Calculer l'ABCD2</a>.</p>`,o:[["Oui","e_ait_hr"],["Non","e_ait_lr"]]},
+ e_ait_fa:{end:{title:"AIT sur fibrillation atriale",lvl:'warn',html:tCard("Conduite",["Anticoagulant oral, d'emblée après un AIT (<a href=\"#reprise\">délais</a>).",`Dose selon la fonction rénale : <a href="#cockcroft">Cockcroft</a>.`,`<a href="#chadsvasc">CHA2DS2-VA</a> et <a href="#hasbled">HAS-BLED</a> pour le dossier.`,"Pas d'association systématique à un antiagrégant."])+`<p class="note">ESC 2024, HAS.</p>`}},
+ e_ait_car:{end:{title:"AIT sur sténose carotidienne",lvl:'crit',html:tCard("Conduite",["Hospitalisation, antiagrégant, statine à forte dose.","Avis chirurgical vasculaire sans attendre : sténose de 70 à 99 %, endartériectomie ; de 50 à 69 %, à discuter.","Le bénéfice est le plus net dans les <b>2 semaines</b> qui suivent l'accident.",`<a href="#prevention">Prévention secondaire</a>.`])+`<p class="note">HAS, prévention vasculaire après un infarctus cérébral ou un AIT.</p>`}},
+ e_ait_hr:{end:{title:"AIT à haut risque",lvl:'crit',html:tCard("Conduite",["Hospitalisation, en USINV si possible : le risque de récidive est maximal dans les 48 premières heures.","<b>Aspirine et clopidogrel</b> pendant 21 jours si la cause n'est pas cardio-embolique (<a href=\"#dapt\">doses de charge</a>).","Scope à la recherche d'une fibrillation atriale, imagerie des artères, échographie cardiaque.","Statine, contrôle tensionnel."])+`<p class="note">HAS 2025 (argumentaire du parcours AVC), ESO 2021.</p>`}},
+ e_ait_lr:{end:{title:"AIT à risque plus faible",lvl:'ok',html:tCard("Conduite",["Un score bas ne dispense pas du bilan : il doit être fait dans les 24 heures.","Un seul antiagrégant, après la dose de charge d'aspirine.","Information du patient : rappeler le 15 au moindre signe.","Imagerie des artères, ECG et recherche de fibrillation atriale, bilan lipidique et glycémique."])+`<p class="note">HAS, prise en charge de l'AIT.</p>`}},
+ ceph:{q:"Un critère de la règle d'Ottawa est-il présent ?",h:tUl(["Âge de 40 ans ou plus.","Douleur ou raideur de la nuque.","Perte de connaissance constatée.","Début pendant un effort.","Céphalée en coup de tonnerre.","Flexion du cou limitée."]),o:[["Oui, au moins un","ceph_tdm"],["Aucun","e_ceph_no"]]},
+ ceph_tdm:{q:"Que montre le scanner sans injection ?",o:[
+  ["Hémorragie méningée","e_hsa"],
+  ["Normal, fait dans les 6 heures","e_ceph_6"],
+  ["Normal, fait après 6 heures","e_ceph_pl"]]},
+ e_ceph_no:{end:{title:"Hémorragie méningée peu probable",lvl:'ok',html:tCard("Mais penser aux autres causes",["Thrombose veineuse cérébrale : céphalée progressive, terrain à risque.","Dissection cervicale : douleur du cou, signe de Claude Bernard-Horner.","Vasoconstriction cérébrale réversible : coups de tonnerre répétés.","Méningite, hypertension intracrânienne, glaucome aigu.","Au moindre doute : imagerie avec séquences artérielles et veineuses."])+`<p class="note">Règle d'Ottawa (Perry, JAMA 2013) : valable à partir de 15 ans, céphalée maximale en moins d'une heure, examen neurologique normal.</p>`}},
+ e_ceph_6:{end:{title:"Scanner normal dans les 6 heures",lvl:'ok',html:tCard("Conduite",["Lu par un radiologue, sur un scanner récent : l'hémorragie méningée devient très peu probable.","Coup de tonnerre typique : compléter par un angioscanner artériel et veineux (anévrisme, vasoconstriction réversible, dissection, thrombose veineuse).","Doute persistant : ponction lombaire."])+`<p class="note">Rédigé de mémoire d'après Perry (BMJ 2011) : à valider avec le senior.</p>`}},
+ e_ceph_pl:{end:{title:"Scanner normal après 6 heures",lvl:'warn',html:tCard("Conduite",["Le scanner ne suffit plus à écarter une hémorragie méningée.","Ponction lombaire, au moins 12 heures après le début, avec recherche de pigments.","Ou angioscanner selon le protocole local.",`<a href="#hsa">Fiche hémorragie méningée</a>.`])+`<p class="note">Rédigé de mémoire : à valider avec le senior.</p>`}},
+ vert:{q:"Le vertige est-il continu, avec un nystagmus à l'examen ?",o:[["Oui : syndrome vestibulaire aigu","vert_hints"],["Non : bref, déclenché par les changements de position","e_vert_pos"]]},
+ vert_hints:{q:"Que donne le HINTS plus ?",h:`<p class="small muted"><a href="#hints">Faire le HINTS plus</a>.</p>`,o:[["Les quatre signes sont périphériques","e_vert_p"],["Au moins un signe central","e_vert_c"]]},
+ e_vert_p:{end:{title:"Profil périphérique",lvl:'ok',html:tCard("Conduite",["Névrite vestibulaire probable.","Garder un doute si le patient a plusieurs facteurs de risque vasculaire, ne tient pas debout seul, ou a une céphalée ou une douleur du cou.","Dans ce cas : IRM avec diffusion."])+`<p class="note">Le HINTS n'est fiable que fait par un examinateur entraîné.</p>`}},
+ e_vert_c:{end:{title:"Signe central : AVC de la fosse postérieure à éliminer",lvl:'crit',html:tCard("Conduite",["IRM avec diffusion et imagerie des artères, en urgence.","Une IRM précoce normale n'élimine pas un petit infarctus : la répéter si la clinique reste centrale.","Si l'infarctus est confirmé : reprendre l'arbre à l'étape de l'imagerie.","Infarctus cérébelleux : surveiller l'<a href=\"#malin\">œdème</a>."])}},
+ e_vert_pos:{end:{title:"Vertige positionnel",lvl:'ok',html:tCard("Conduite",["Manœuvre de Dix-Hallpike : vertige positionnel paroxystique bénin probable.","Épisodes brefs spontanés chez un patient à risque vasculaire : penser à l'AIT vertébro-basilaire, imagerie des artères."])}}
+};
+function treeState(tp){ const s={}; tp.forEach(p=>Object.assign(s,TREE[p.id].o[p.i][2]||{})); return s; }
+function treeCur(tp){ return tp.length?TREE[tp[tp.length-1].id].o[tp[tp.length-1].i][1]:'start'; }
+function treeLeaf(id,s){ const e=TREE[id].end; return typeof e==='function'?e(s):e; }
+
+/* ---------- Carnet de garde (fonctions pures) ---------- */
+const CTYPES=[['avis',"Avis d'un service",'#2D82D8'],['urg','Avis des urgences','#E0871B'],['usinv','Patient de l\'USINV','#17988A'],['unv','Patient UNV / neuro G','#4A5DE2'],['senior','Demande du senior de garde','#9A48C4'],['alerte','Alerte thrombolyse','#D8404F']];
+const cType=k=>CTYPES.find(t=>t[0]===k)||(k==='service'?['service','Patient du service','#17988A']:k==='pec'?['pec','Prise en charge','#C29A12']:['','Type à préciser','#7A8499']);
+const cLabel=e=>e.type==='avis'&&e.svc?'Avis '+e.svc:cType(e.type)[1];
+const hhmm=ms=>{ const d=new Date(ms); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
+function carnetSort(list){ return list.slice().sort((a,b)=>(!!a.traite-!!b.traite)||(!!b.urgent-!!a.urgent)||(a.t-b.t)); }
+function cWho(e){ const p=[]; p.push(e.nom||'Patient sans nom'); if(e.age) p.push(e.age+' ans'); if(e.sexe) p.push(e.sexe==='Femme'?'F':'H'); return p.join(', '); }
+function cStatus(e){ const a=[]; a.push(e.vu?'vu':'pas encore vu'); a.push(e.avis?'avis noté dans le dossier':'avis non noté'); a.push(e.traite?'demande traitée':'demande non traitée'); return a.join(', '); }
+function carnetEntryText(e0,n){
+  const e=Object.assign({},e0); ['notes','motif','atcd','ttt','exam','concl'].forEach(k=>{ if(e[k]) e[k]=String(e[k]).trim().replace(/\n+/g,'\n      '); });
+  const L=[(n?n+'. ':'')+'['+cLabel(e)+'] '+hhmm(e.t)+' – '+cWho(e)+(e.lieu?' – '+e.lieu:'')+(e.urgent?' – URGENT':'')];
+  if(e.appelant) L.push('   Appelé par : '+e.appelant);
+  if(e.notes) L.push('   Notes : '+e.notes);
+  if(e.motif) L.push('   Motif : '+e.motif);
+  if(e.atcd) L.push('   Antécédents : '+e.atcd);
+  if(e.ttt||e.aco) L.push('   Traitement : '+[e.aco?'SOUS ANTICOAGULANT':'',e.ttt].filter(Boolean).join(' ; '));
+  if(e.exam) L.push('   Examen : '+e.exam);
+  if(e.concl) L.push('   Fait / avis donné : '+e.concl);
+  const rest=(e.todos||[]).filter(x=>!x.done).map(x=>x.x), done=(e.todos||[]).filter(x=>x.done).map(x=>x.x);
+  if(rest.length) L.push('   Reste à faire : '+rest.join(' ; '));
+  if(done.length) L.push('   Déjà fait : '+done.join(' ; '));
+  if(e.type==='alerte') cAlerteLines(e).forEach(x=>L.push(x));
+  if(e.trame&&(e.ts||[]).length){ const tr=TRAMES.find(x=>x.k===e.trame); if(tr) L.push('   '+tr.n+', éléments présents : '+e.ts.join(' ; ')); }
+  if(e.rv) L.push('   À revoir à '+hhmm(e.rv));
+  L.push('   Suivi : '+cStatus(e));
+  return L.join('\n');
+}
+function carnetText(list,now){
+  const d=new Date(now), ds=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+  const open=carnetSort(list).filter(e=>!e.traite||e.transmettre);
+  const L=['TRANSMISSIONS DE GARDE – '+ds+' – '+open.length+' patient'+(open.length>1?'s':'')+' à faire',''];
+  if(!open.length) L.push('Aucun patient à transmettre.');
+  open.forEach((e,i)=>L.push(carnetEntryText(e,i+1),''));
+  return L.join('\n').trim();
+}
+
+/* ---------- Carnet : alerte, surveillance, trames ---------- */
+const SURV_N=36;
+function survSchedule(tb){ const a=[]; for(let i=1;i<=8;i++) a.push(tb+i*15*6e4); for(let i=1;i<=12;i++) a.push(tb+(120+i*30)*6e4); for(let i=1;i<=16;i++) a.push(tb+(480+i*60)*6e4); return a; }
+const fmtDur=ms=>{ const m=Math.round(ms/6e4); return m<60?m+' min':Math.floor(m/60)+' h '+String(m%60).padStart(2,'0'); };
+const ATIMES=[['t0','Début ou dernière fois vu normal'],['ta','Arrivée'],['ti','Imagerie'],['tn','Appel du neuroradiologue'],['tb','Bolus de thrombolyse']];
+function cDelays(e){ const d=[], add=(a,b,l)=>{ if(e[a]&&e[b]&&e[b]>=e[a]) d.push([l,fmtDur(e[b]-e[a])]); };
+  add('t0','ta','Début → arrivée'); add('ta','ti','Arrivée → imagerie'); add('ta','tb','Arrivée → bolus'); add('t0','tb','Début → bolus'); return d; }
+function cSurvNext(e){ if(!e.tb) return null; const n=e.surv||0; return n>=SURV_N?null:survSchedule(e.tb)[n]; }
+function cAlerteLines(e){ const L=[], ts=ATIMES.filter(t=>e[t[0]]).map(t=>t[1].toLowerCase()+' '+hhmm(e[t[0]]));
+  if(ts.length) L.push('   Horaires : '+ts.join(', '));
+  const d=cDelays(e); if(d.length) L.push('   Délais : '+d.map(x=>x[0].toLowerCase()+' '+x[1]).join(', '));
+  if(e.nihss) L.push('   NIHSS : '+e.nihss); if(e.dec) L.push('   Décision : '+e.dec);
+  if(e.tb){ const nx=cSurvNext(e), n=e.surv||0; L.push('   Surveillance post-thrombolyse : '+n+' contrôle'+(n>1?'s':'')+' sur '+SURV_N+(nx?', prochain à '+hhmm(nx):', terminée')); }
+  return L; }
+const TRAMES=[
+ {k:'crise',n:"Crise épileptique",
+  s:["Première crise","Épilepsie connue","Crise généralisée tonico-clonique","Début focal","Durée de plus de 5 minutes","Crises répétées sans reprise de conscience","Déficit post-critique","Confusion prolongée","Morsure latérale de langue","Fièvre","Céphalée inhabituelle avant la crise","Traumatisme crânien","Oubli du traitement","Alcool ou sevrage","Médicament proconvulsivant","Grossesse ou post-partum"],
+  f:["Glycémie capillaire","Ionogramme, calcémie, créatinine","Alcoolémie et toxiques","Dosage de l'antiépileptique","ECG","Imagerie cérébrale","EEG","Ponction lombaire"],
+  r:`Plus de 5 minutes, ou crises sans reprise de conscience : <a href="#eme">état de mal</a>. Imagerie en urgence devant un déficit focal, une première crise, de la fièvre, un traumatisme, un anticoagulant, une céphalée ou une confusion qui dure.`},
+ {k:'confusion',n:"Confusion",
+  s:["Début brutal","Fluctuations dans la journée","Fièvre","Déficit focal","Trouble du langage","Céphalée","Raideur de nuque","Chute ou traumatisme crânien","Globe vésical","Fécalome","Douleur","Nouveau médicament ou sevrage","Alcool","Troubles cognitifs connus","Hallucinations","Clonies ou myoclonies discrètes"],
+  f:["Glycémie capillaire","Ionogramme, calcémie, créatinine","NFS, CRP","Bilan hépatique","ECG","Bandelette urinaire","Bladder scan","Revoir l'ordonnance","Imagerie cérébrale","EEG","Ponction lombaire"],
+  r:`Fièvre et confusion : méningo-encéphalite jusqu'à preuve du contraire, ponction lombaire et traitement sans attendre les résultats. Une aphasie de Wernicke et un état de mal non convulsif ressemblent à une confusion. Critères : <a href="#cam">CAM</a>.`},
+ {k:'cephalee',n:"Céphalée",
+  s:["Coup de tonnerre","Inhabituelle pour le patient","Progressive sur plusieurs jours","Fièvre","Raideur de nuque","Déficit focal","Crise épileptique","Flou visuel ou œdème papillaire","Douleur cervicale","Claude Bernard-Horner","Début à l'effort","Pire couché ou le matin","Grossesse ou post-partum","Plus de 50 ans, douleur temporale","Immunodépression ou cancer","Migraineux connu, crise habituelle"],
+  f:["Scanner sans injection","Angioscanner artériel et veineux","IRM cérébrale","Ponction lombaire","CRP","Fond d'œil","Pression artérielle"],
+  r:`Coup de tonnerre : suivre la branche céphalée de l'<a href="#arbre">arbre AVC</a>. Voir aussi <a href="#hsa">hémorragie méningée</a> et <a href="#tvc">thrombose veineuse cérébrale</a>.`},
+ {k:'vertige',n:"Vertige",
+  s:["Continu depuis des heures","Bref, déclenché par la position","Nystagmus à l'examen","Ne tient pas debout seul","Diplopie","Dysarthrie","Trouble de la déglutition","Déficit sensitif ou moteur","Céphalée ou douleur cervicale","Surdité brutale","Facteurs de risque vasculaire"],
+  f:["HINTS plus","Manœuvre de Dix-Hallpike","Glycémie capillaire","ECG","IRM avec diffusion","Imagerie des artères"],
+  r:`Vertige continu avec nystagmus : <a href="#hints">HINTS plus</a>. Un patient qui ne tient pas debout seul est suspect d'atteinte centrale, quel que soit le HINTS.`},
+ {k:'malaise',n:"Malaise, perte de connaissance",
+  s:["Perte de connaissance brève","Prodromes : sueurs, voile noir","Survenue à l'effort","Survenue debout ou au lever","Palpitations ou douleur thoracique","Mouvements anormaux","Morsure latérale de langue","Confusion après l'épisode","Retour rapide à la normale","Déficit focal transitoire","Traumatisme à la chute","Cardiopathie connue"],
+  f:["ECG","Glycémie capillaire","Pression artérielle couché puis debout","Troponine","Scope","Avis cardiologique","EEG"],
+  r:`À l'effort, sans prodrome, avec une cardiopathie ou un ECG anormal : cause cardiaque à éliminer d'abord. Un déficit focal transitoire fait suivre la branche AIT de l'<a href="#arbre">arbre AVC</a>.`}
+];
+
+/* ---------- Arbres complets ---------- */
+const fQ=(q,b,h)=>({q,b,h}), fS=(t,l,a)=>({s:t,l,a}), fE=(v,t,l,a)=>({e:v,t,l:l||[],a}), fG=(k,t)=>({g:k,t});
+const FT={
+ alerte:{n:"Alerte AVC",d:"Du premier appel à la bonne branche",b:[
+  fQ("Quelle est la situation ?",[
+   ["Déficit focal brutal, encore présent",[
+     fS("Premiers gestes, avant l'imagerie",["Heure de la dernière fois vu normal, témoin joignable.","<b>Glycémie capillaire</b> : corriger une hypoglycémie puis réévaluer.","Pression artérielle, NIHSS, poids.","Anticoagulant : lequel, et l'heure de la dernière prise.","Voie veineuse, bilan : NFS, plaquettes, TP et INR, TCA.","Imagerie cérébrale et vasculaire en urgence, IRM si possible. Cible : moins de 25 minutes après l'arrivée."],[["#nihss","NIHSS"]]),
+     fQ("Que montre l'imagerie ?",[
+      ["Infarctus, ou pas de saignement avec un déficit persistant",fG('infarctus',"Arbre infarctus")],
+      ["Hématome intracérébral",fG('hematome',"Arbre hématome")],
+      ["Hémorragie méningée",fE('crit',"Hémorragie méningée",["Angioscanner, transfert en centre de neurochirurgie et de neuroradiologie interventionnelle.","Systolique sous 160 tant que l'anévrisme n'est pas traité.","Réversion des antithrombotiques, nimodipine 60 mg toutes les 4 heures."],[["#hsa","Fiche"]])],
+      ["Thrombose veineuse cérébrale",fE('crit',"Thrombose veineuse cérébrale",["<b>Héparine à dose curative</b>, même s'il existe une lésion hémorragique.","Traitement des crises. Coma ou effet de masse : réanimation et neurochirurgie."],[["#tvc","Fiche"]])],
+      ["Normale, avec un doute sur le diagnostic",fE('warn',"AVC ou diagnostic différentiel ?",["Un scanner normal n'élimine pas un infarctus. L'IRM de diffusion peut être négative au début, surtout dans la fosse postérieure.","Déficit handicapant, typique, dans les délais : suivre l'arbre infarctus.","Sinon : diagnostics différentiels."],[["#mimics","Diagnostics différentiels"]])]])]],
+   ["Déficit qui a régressé",fG('ait',"Arbre AIT")],
+   ["Céphalée brutale ou inhabituelle, sans déficit",fG('cephalee',"Arbre céphalée")],
+   ["Vertige aigu isolé",fG('vertige',"Arbre vertige")]])]},
+ infarctus:{n:"Infarctus",d:"Thrombolyse et thrombectomie s'évaluent en parallèle",b:[
+  fS("1. La thrombolyse",["Suivre les branches ci-dessous.","Vérifier les contre-indications avant tout bolus."],[["#thrombolyse","Contre-indications"]]),
+  fQ("Le déficit est-il handicapant ?",[
+   ["Non : AVC mineur (NIHSS ≤ 5) non handicapant",fE('warn',"Pas de thrombolyse",["Non conseillée (grade B).","Occlusion intracrânienne : à discuter au cas par cas (grade C).","NIHSS ≤ 3, cause non cardio-embolique : aspirine et clopidogrel pendant 21 jours."],[["#dapt","Bithérapie"]])],
+   ["Oui",fQ("Délai depuis la dernière fois vu normal ?",[
+     ["Moins de 4 h 30",fQ("Une contre-indication ?",[
+       ["Aucune",fE('ok',"Thrombolyse",["Ténectéplase 0,25 mg/kg ou altéplase 0,9 mg/kg (grade A).","Occlusion proximale antérieure : ténectéplase à privilégier (grade A).","Objectif : moins de 60 minutes entre l'arrivée et le bolus."],[["#dose","Dose selon le poids"]])],
+       ["Oui",fE('warn',"Pas de thrombolyse",["Évaluer la thrombectomie, plus bas."])]])],
+     ["De 4 h 30 à 9 h, heure connue",fQ("Mismatch en perfusion, NIHSS ≥ 4 ?",[
+       ["Oui",fE('ok',"Altéplase 0,9 mg/kg",["Si la thrombectomie n'est pas indiquée ou pas prévue.","Hors AMM. Pas de ténectéplase dans cette indication."])],
+       ["Non, ou perfusion indisponible",fE('warn',"Pas de thrombolyse",[])]],"Critères indicatifs (EXTEND) : Tmax > 6 s, nécrose < 70 mL, rapport > 1,2, mismatch > 10 mL.")],
+     ["Heure inconnue, ou constaté au réveil",fQ("Imagerie de sélection, NIHSS ≥ 4 ?",[
+       ["IRM dans les 4 h 30 après la constatation : diffusion positive, FLAIR négatif",fE('ok',"Altéplase 0,9 mg/kg",["Grade A.","Si la thrombectomie n'est pas indiquée ou pas prévue."])],
+       ["Mismatch en perfusion, dans les 9 h après le milieu du sommeil",fE('ok',"Altéplase 0,9 mg/kg",["Grade B.","Si la thrombectomie n'est pas indiquée ou pas prévue."])],
+       ["Ni l'un ni l'autre",fE('warn',"Pas de thrombolyse",[])]])],
+     ["Plus de 9 heures",fE('warn',"Pas de thrombolyse",["La thrombectomie reste possible jusqu'à 24 h."])]])]],
+   "Handicapant : il empêcherait le retour aux activités, quel que soit le NIHSS (aphasie, hémianopsie…)."),
+  fS("2. La thrombectomie",["À évaluer en même temps, sans attendre la fin de la thrombolyse."]),
+  fQ("Occlusion à l'imagerie vasculaire ?",[
+   ["Carotide interne ou M1",fQ("Étendue de l'infarctus ?",[
+     ["ASPECTS de 6 à 10",fQ("Délai ?",[
+       ["Moins de 6 heures",fE('ok',"Thrombectomie",["Associée à la thrombolyse si le patient est éligible aux deux (grade B), sans la retarder."])],
+       ["De 6 à 24 heures",fE('ok',"Thrombectomie sur sélection",["De 6 à 16 h : critères DAWN ou DEFUSE-3.","De 16 à 24 h : critères DAWN."])]])],
+     ["ASPECTS de 3 à 5",fE('ok',"Thrombectomie possible jusqu'à 24 h",["Moins de 80 ans, Rankin antérieur 0 ou 1, NIHSS inférieur à 30 (grade B)."])],
+     ["ASPECTS de 0 à 2",fE('warn',"Thrombectomie possible jusqu'à 7 h",["Moins de 80 ans, Rankin antérieur 0 ou 1, NIHSS ≥ 6 (grade C)."])]],"")],
+   ["Tronc basilaire ou artère vertébrale",fE('ok',"Thrombectomie possible jusqu'à 24 h",["Rankin antérieur 0 ou 1, NIHSS ≥ 10, PC-ASPECTS ≥ 6, sans ischémie bilatérale du pont ou du mésencéphale (grade B)."])],
+   ["M2 ou plus distale",fE('warn',"Au cas par cas",["Non traitée par la fiche HAS 2025 : à discuter avec le neuroradiologue interventionnel."])],
+   ["Aucune",fE('warn',"Pas de thrombectomie",[])]]),
+  fS("3. Dans tous les cas, en USINV",["Pression artérielle : sous 185/110 avant la thrombolyse, sous 180/105 pendant 24 h après. Sans reperfusion : la respecter jusqu'à 220/120.","Aspirine 160 à 300 mg dès que l'hémorragie est écartée. Après une thrombolyse : rien pendant 24 h, puis après l'imagerie de contrôle.","Insuline à partir de 1,8 g/L. Paracétamol au-dessus de 37,5 °C. Oxygène seulement si la SpO2 passe sous 95 %.","Test de déglutition avant toute prise orale. HBPM préventive si le patient est immobilisé.","Pas de corticoïdes ni d'héparine à dose curative."],[["#ta","Objectifs tensionnels"],["#complications","Complications"],["#malin","Infarctus malin"]])]},
+ hematome:{n:"Hématome",d:"Les quatre gestes de la première heure",b:[
+  fS("Dès le diagnostic",["Angioscanner : malformation, anévrisme, thrombose veineuse.","Gravité : ICH score et volume ABC/2."],[["#ich","ICH score"],["#abc2","Volume ABC/2"]]),
+  fQ("1. Antithrombotique en cours ?",[
+   ["AVK",fE('crit',"PPSB 25 UI/kg et vitamine K 10 mg",["Sans attendre l'INR. Objectif : INR à 1,2 ou moins, contrôle à 30 minutes."])],
+   ["Dabigatran",fE('crit',"Idarucizumab 5 g",["S'il manque : PPSB 50 UI/kg."])],
+   ["Apixaban, rivaroxaban, édoxaban",fE('crit',"PPSB 50 UI/kg",["Sauf si la concentration est à 30 ng/mL ou moins. Andexanet selon la disponibilité locale."])],
+   ["Héparine",fE('crit',"Protamine",["Dose selon l'héparine reçue."])],
+   ["Antiagrégant",fE('warn',"Arrêt",["Pas de transfusion de plaquettes, sauf geste neurochirurgical."])],
+   ["Aucun",fE('ok',"Pas de réversion",["Vérifier quand même plaquettes, TP et TCA."])]]),
+  fS("2 et 3. Pour tous",["Pression artérielle <b>sous 140/90</b>, atteinte vite et gardée stable (objectif du service).","Glycémie et température corrigées dès l'admission : avec la pression et la réversion, c'est le « bundle » de l'essai INTERACT3.","Compression pneumatique intermittente d'emblée.","Pas d'antiépileptique préventif, pas de corticoïdes."],[["#reversion","Réversion détaillée"]]),
+  fQ("4. Siège et gravité ?",[
+   ["Cervelet",fE('crit',"Avis neurochirurgical systématique",["Évacuation au-delà de 15 mL, ou devant une compression du tronc ou une hydrocéphalie."])],
+   ["Troubles de la vigilance, hydrocéphalie, effet de masse",fE('crit',"Neurochirurgie et réanimation en urgence",["Dérivation ventriculaire externe en cas d'hydrocéphalie.","Ne pas baisser la pression trop vite : cible à fixer avec le réanimateur."])],
+   ["Lobaire, sans gravité",fE('warn',"Traitement médical",["Évacuation mini-invasive précoce à discuter (essai ENRICH).","Après 55 ans : penser à l'angiopathie amyloïde (IRM avec T2*)."])],
+   ["Profond, sans gravité",fE('ok',"Traitement médical",["Pas de chirurgie en routine.","Hypertendu : microangiopathie hypertensive probable."])]]),
+  fS("Ensuite",["Scanner de contrôle à 24 h, ou tout de suite si aggravation.","Pas de limitation des soins sur le score seul dans les 24 premières heures.","HBPM préventive à discuter après 24 à 48 h si l'hématome est stable."],[["#causes-hematome","Causes à chercher"]])]},
+ ait:{n:"AIT",d:"Déficit transitoire, régressé",b:[
+  fS("Pour tous",["IRM de préférence et imagerie des artères en urgence, ECG, bilan dans les 24 h.","Aspirine 160 à 300 mg dès que l'hémorragie est écartée."]),
+  fQ("Une cause est-elle déjà identifiée ?",[
+   ["Fibrillation atriale",fE('warn',"Anticoagulant oral",["D'emblée après un AIT.","Dose selon la fonction rénale."],[["#cockcroft","Cockcroft"],["#reprise","Délais"]])],
+   ["Sténose carotidienne ≥ 50 % du côté symptomatique",fE('crit',"Avis chirurgical sans attendre",["De 70 à 99 % : endartériectomie. De 50 à 69 % : à discuter.","Bénéfice maximal dans les 2 semaines."],[["#prevention","Prévention"]])],
+   ["Pas encore",fQ("ABCD2 à 4 ou plus ?",[
+     ["Oui",fE('crit',"AIT à haut risque",["Hospitalisation, en USINV si possible.","Aspirine et clopidogrel pendant 21 jours si la cause n'est pas cardio-embolique.","Scope, imagerie des artères, échographie cardiaque, statine."],[["#dapt","Bithérapie"]])],
+     ["Non",fE('ok',"AIT à risque plus faible",["Le bilan reste à faire dans les 24 heures.","Un seul antiagrégant. Rappeler le 15 au moindre signe."])]],"<a href=\"#abcd2\">Calculer l'ABCD2</a>")]])]},
+ cephalee:{n:"Céphalée brutale",d:"Hémorragie méningée à éliminer",b:[
+  fQ("Un critère de la règle d'Ottawa ?",[
+   ["Aucun",fE('ok',"Hémorragie méningée peu probable",["Penser quand même à la thrombose veineuse, à la dissection, à la vasoconstriction réversible, à la méningite.","Au moindre doute : imagerie artérielle et veineuse."])],
+   ["Au moins un",[fS("Scanner sans injection",[]),fQ("Résultat ?",[
+     ["Hémorragie méningée",fE('crit',"Hémorragie méningée",["Angioscanner, centre de neurochirurgie, nimodipine."],[["#hsa","Fiche"]])],
+     ["Normal, fait dans les 6 heures",fE('ok',"Hémorragie méningée très peu probable",["Coup de tonnerre typique : angioscanner artériel et veineux.","Doute persistant : ponction lombaire."])],
+     ["Normal, fait après 6 heures",fE('warn',"Le scanner ne suffit plus",["Ponction lombaire au moins 12 heures après le début, avec recherche de pigments.","Ou angioscanner selon le protocole local."])]])]]],
+   "Âge ≥ 40 ans · douleur ou raideur de nuque · perte de connaissance · début à l'effort · coup de tonnerre · flexion du cou limitée.")]},
+ vertige:{n:"Vertige aigu",d:"Périphérique ou central ?",b:[
+  fQ("Vertige continu, avec un nystagmus à l'examen ?",[
+   ["Non : bref, déclenché par la position",fE('ok',"Vertige positionnel",["Manœuvre de Dix-Hallpike.","Épisodes brefs spontanés chez un patient vasculaire : penser à l'AIT vertébro-basilaire."])],
+   ["Oui : syndrome vestibulaire aigu",fQ("Que donne le HINTS plus ?",[
+     ["Les quatre signes sont périphériques",fE('ok',"Névrite vestibulaire probable",["Doute si le patient ne tient pas debout seul, a une céphalée, une douleur du cou ou plusieurs facteurs de risque : IRM avec diffusion."])],
+     ["Au moins un signe central",fE('crit',"AVC de la fosse postérieure à éliminer",["IRM avec diffusion et imagerie des artères, en urgence.","Une IRM précoce normale n'élimine pas un petit infarctus.","Infarctus cérébelleux : surveiller l'œdème."],[["#malin","Infarctus malin"]])]],"<a href=\"#hints\">Faire le HINTS plus</a>")]])]}
+};
+const FT_ORDER=['alerte','infarctus','hematome','ait','cephalee','vertige'];
+let ftKey='alerte', treeMode='full';
+function ftLinks(a){ return a&&a.length?`<div class="fl-links">${a.map(x=>`<a href="${x[0]}">${x[1]}</a>`).join('')}</div>`:''; }
+function ftBlocks(arr){ return (Array.isArray(arr)?arr:[arr]).map(ftBlock).join('<i class="fl-down" aria-hidden="true"></i>'); }
+function ftBlock(x){
+  if(x.s!==undefined) return `<div class="fl-step"><b>${x.s}</b>${x.l&&x.l.length?tUl(x.l):''}${ftLinks(x.a)}</div>`;
+  if(x.e) return `<div class="fl-end ${x.e}"><b>${x.t}</b>${x.l.length?tUl(x.l):''}${ftLinks(x.a)}</div>`;
+  if(x.g) return `<button class="fl-goto" data-ft="${x.g}">${x.t}</button>`;
+  if(x.q) return `<div class="fl-q"><b>${x.q}</b>${x.h?`<span class="small muted">${x.h}</span>`:''}</div><div class="fl-brs">${x.b.map(br=>`<div class="fl-br"><span class="fl-lab">${br[0]}</span>${ftBlocks(br[1])}</div>`).join('')}</div>`;
+  return '';
+}
+function ftCount(arr){ let n=0; (Array.isArray(arr)?arr:[arr]).forEach(x=>{ if(x.e) n++; if(x.q) x.b.forEach(br=>n+=ftCount(br[1])); }); return n; }
+/*UI*/
+const app=document.getElementById('app'), S={}, V={};
+const KIND={score:'score',calc:'calcul',ref:'mémo',form:'mot',mrc:'testing',carnet:'carnet',arbre:'arbre',annuaire:'numéros'}; const F={}; let M={};
+let onset=null, q='';
+try{ const o=+localStorage.getItem('gn-onset'); if(o&&Date.now()-o<36*36e5) onset=o; }catch(e){}
+const saveOnset=()=>{ try{ onset?localStorage.setItem('gn-onset',onset):localStorage.removeItem('gn-onset'); }catch(e){} };
+const hm=m=>Math.floor(m/60)+' h '+String(Math.floor(m%60)).padStart(2,'0');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function chronoHTML(){
+  let big='<span class="muted">-- h --</span>', wins='', pos=null, seg=0, val='';
+  if(onset){
+    const min=Math.max(0,(Date.now()-onset)/6e4), h=min/60, d=new Date(onset);
+    val=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    big=hm(min)+'<small>depuis le début</small>'; pos=railPos(h); seg=h<4.5?1:h<6?2:h<9?3:4;
+    const left=(lim,lab,after)=>'<li><span>'+lab+'</span>'+(min<lim*60?'<b class="'+(lim*60-min<45?'is-warn':'is-ok')+'">reste '+hm(lim*60-min)+'</b>':'<b class="is-crit">'+after+'</b>')+'</li>';
+    wins=left(4.5,'Thrombolyse, avant 4 h 30',h<9?'dépassé : imagerie de sélection':'dépassé')+left(6,'Thrombectomie, avant 6 h',h<24?'sélection par imagerie':'au-delà de 24 h');
+  } else wins='<li class="muted">Saisis l\'heure de début, ou la dernière fois vu normal.</li>';
+  return `<section class="chrono" aria-label="Chrono depuis le début des symptômes">
+  <div class="chrono-head"><div class="elapsed">${big}</div>
+  <div class="onset"><input type="time" id="onset" aria-label="Heure de début des symptômes" value="${val}"><button class="ghost" data-act="now">Maintenant</button>${onset?'<button class="ghost" data-act="clear">Effacer</button>':''}</div></div>
+  <div><div class="rail">${[1,2,3,4].map(i=>`<i class="s${i}${seg===i?' on':''}"></i>`).join('')}${pos===null?'':`<span class="cursor" style="left:${pos}%"></span>`}</div>
+  <div class="ticks"><span>0</span><span>4 h 30</span><span>6 h</span><span><span>9 h</span><span>24 h</span></span></div></div>
+  <ul class="windows">${wins}</ul></section>`;
+}
+function listHTML(){
+  const f=q.trim().toLowerCase();
+  const out=GROUPS.map(([g,name,col])=>{ const ts=TOOLS.filter(t=>t.g===g&&(!f||(t.n+' '+t.d).toLowerCase().includes(f)));
+    return ts.length?`<section class="group" style="--gc:${col}"><h2><i class="dot"></i>${name}</h2><div class="list">${ts.map(t=>`<a href="#${t.id}"><strong>${esc(t.n)}</strong><span class="kind">${KIND[t.type]}</span><span class="d">${esc(t.d)}</span></a>`).join('')}</div></section>`:''; }).join('');
+  return out||'<p class="muted">Aucun outil ne correspond à cette recherche.</p>';
+}
+function home(){
+  app.innerHTML=`<header class="top"><h1>Garde neuro</h1><p class="muted">Scores et repères de l'alerte AVC et de l'USINV.</p></header>
+  ${tabs('home')}
+  <div id="chrono">${chronoHTML()}</div>
+  <a class="start" href="#alerte">Dérouler une alerte thrombolyse<span>6 étapes</span></a>
+  <nav class="quick" aria-label="Accès rapide"><a href="#nihss"><b>NIHSS</b><span>coter</span></a><a href="#entree"><b>Mot d'entrée</b><span>à cocher</span></a><a href="#dose"><b>Dose</b><span>selon le poids</span></a></nav>
+  <input class="search" id="q" type="search" placeholder="Chercher un score" aria-label="Chercher un score" value="${esc(q)}">
+  <div id="list" style="display:flex;flex-direction:column;gap:22px">${listHTML()}</div>
+  <footer>Aide-mémoire personnel. Les doses et les seuils viennent des recommandations citées dans chaque fiche : vérifie-les avec le protocole du service.</footer>`;
+}
+function head(t,reset){ return `<div class="tool-head"><div class="line"><a class="back" href="${fromId==='arbre'?'#arbre':fromId==='carnet'?'#carnet':'#'}">${fromId==='arbre'?"Retour à l'arbre":fromId==='carnet'?'Retour au carnet':'Tous les outils'}</a>${reset?'<button class="ghost small" data-act="reset">Remettre à zéro</button>':''}</div><p class="gname" style="--gc:${(LAYOUT.find(l=>l[0]===t.g)||[])[2]}"><i class="dot"></i>${(LAYOUT.find(l=>l[0]===t.g)||[])[1]}</p><h1>${esc(t.n)}</h1><p class="muted">${esc(t.d)}</p><p class="small muted">Fiche relue le 13 novembre 2026</p></div>`; }
+function bar(big,txt,lvl,can,isText){ return `<div class="bar ${lvl||''}"><div id="fallback"></div><div class="bar-in"><div class="big${isText?' text':''}">${big}</div><div class="verdict">${txt}</div><button class="copy" data-act="copy"${can?'':' disabled'}>Copier</button></div></div>`; }
+function scoreBar(t){
+  const s=S[t.id], r=score(t,s);
+  if(r.miss) return bar('–','À compléter : '+r.miss+' item'+(r.miss>1?'s':''),'',false);
+  const [txt,lvl]=t.verdict?t.verdict(s):t.interp(r.tot);
+  return bar(r.tot+'<span>'+(t.unit?'':t.max?'/'+t.max:'')+'</span>',esc(txt),lvl,true);
+}
+function nihssTxt(){ const t=TOOLS.find(x=>x.id==='nihss'), s=S.nihss; return s?copyText(t,s,score(t,s).tot):null; }
+function formBar(){ const n=Object.keys(F).filter(k=>!/^side_|_o$/.test(k)&&F[k]!==''&&!(Array.isArray(F[k])&&!F[k].length)).length; return bar('Mot',n+' réponse'+(n>1?'s':'')+' saisie'+(n>1?'s':''),'',true,true); }
+function formUpdate(){ document.getElementById('preview').textContent=motEntree(F,nihssTxt()); document.getElementById('bar').innerHTML=formBar(); }
+const fieldOf=k=>FORM.flatMap(s=>s.f).find(f=>f.k===k);
+function qInner(f){
+  const multi=!!f.m, base=f.c||f.m, opts=base.concat(f.o&&!base.includes('Autre')?['Autre']:[]), on=o=>multi?(F[f.k]||[]).includes(o):F[f.k]===o;
+  let s=`<p class="ql">${esc(f.l)}${multi?'<small>plusieurs réponses possibles</small>':''}</p><div class="chips">${opts.map(o=>`<button class="chip" data-fk="${f.k}" data-fv="${esc(o)}"${multi?' data-multi="1"':''} aria-pressed="${on(o)}">${esc(o)}</button>`).join('')}</div>`;
+  opts.filter(o=>SIDED[o]&&on(o)).forEach(o=>{ s+=`<div class="sub"><span>${esc(o)}</span><div class="chips">${[['D','Droite'],['G','Gauche']].map(x=>`<button class="chip" data-sk="${esc(o)}" data-sv="${x[0]}" aria-pressed="${F['side_'+o]===x[0]}">${x[1]}</button>`).join('')}</div></div>`; });
+  if(on('Autre')) s+=`<input class="other" data-ff="${f.k}_o" type="text" autocomplete="off" placeholder="Préciser" aria-label="${esc(f.l)} : préciser" value="${esc(F[f.k+'_o']||'')}">`;
+  return s;
+}
+function formTool(t){
+  if(F.h0===undefined&&onset){ const d=new Date(onset); F.h0=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+  const chip=(f,o,multi)=>`<button class="chip" data-fk="${f.k}" data-fv="${esc(o)}"${multi?' data-multi="1"':''} aria-pressed="${multi?(F[f.k]||[]).includes(o):F[f.k]===o}">${esc(o)}</button>`;
+  const ns=S.nihss?score(TOOLS.find(x=>x.id==='nihss'),S.nihss).tot:null;
+  app.innerHTML=head(t,true)+FORM.map(sec=>`<section class="fsec"><h2>${sec.t}</h2>${sec.f.map(f=>f.in
+    ?`<div class="field"><label for="ff-${f.k}">${esc(f.l)}${f.u?' ('+f.u+')':''}</label><input id="ff-${f.k}" data-ff="${f.k}" ${f.in==='time'?'type="time"':f.in==='num'?'inputmode="decimal"':'type="text"'} autocomplete="off" value="${esc(F[f.k]||'')}"></div>`
+    :`<div class="q" data-k="${f.k}">${qInner(f)}</div>`).join('')}${sec.t==="Examen à l'entrée"?`<a class="ghost linkrow" href="#nihss">${ns===null?'Coter le NIHSS, puis revenir ici':'NIHSS coté à '+ns+' : repris dans le mot. Modifier'}</a>`:''}</section>`).join('')
+    +'<section class="fsec"><h2>Mot d\'entrée</h2><pre class="card preview" id="preview"></pre><p class="note">Rien n\'est enregistré : les réponses s\'effacent à la fermeture de la page. Les crochets [ ] marquent ce qui reste à compléter. Relis le mot avant de le valider.</p></section><div id="bar"></div>';
+  formUpdate();
+}
+function mrcBar(){ const tot=MRC.reduce((a,s)=>a+s[1].length,0)*2, n=Object.keys(M).length, low=Object.values(M).filter(x=>x<5).length;
+  return bar(n+'<span>/'+tot+'</span>',n?(low?low+' cotation'+(low>1?'s':'')+' en dessous de 5':'Aucun déficit coté'):'Cote chaque muscle, ou mets tout à 5 puis corrige',n?(low?'warn':'ok'):'',true); }
+function mrcTool(t){
+  let n=0; const side=(k,lab)=>`<div class="side"><span class="sl">${lab}</span>${[0,1,2,3,4,5].map(x=>`<button class="g" data-mk="${k}" data-mv="${x}" aria-label="${lab==='D'?'Droite':'Gauche'} ${x}" aria-pressed="${M[k]===x}">${x}</button>`).join('')}</div>`;
+  app.innerHTML=head(t,true)+`<details class="card"><summary>Rappel de la cotation</summary><ul>${MRC_LEG.map((l,i)=>`<li><b>${i}</b> : ${l.charAt(0).toLowerCase()+l.slice(1)}.</li>`).join('')}</ul></details><button class="ghost" data-act="all5">Tout mettre à 5</button>`
+   +MRC.map(([sec,rows])=>`<section class="fsec"><h2>${sec}</h2>${rows.map(r=>{ const k=n++; return `<div class="mrow"><p class="ql">${esc(r[0])}<small>${esc(r[1])}</small></p>${side(k+'d','D')}${side(k+'g','G')}</div>`; }).join('')}</section>`).join('')
+   +'<div id="bar">'+mrcBar()+'</div>';
+}
+
+/* ---------- Onglets, arbre, carnet (interface) ---------- */
+let CARNET=[], cOpen=null, cFilter='todo', cStoreOK=true, cConfirm='', TP=[], fromId='';
+(function(){ try{ localStorage.setItem('gn-t','1'); localStorage.removeItem('gn-t'); const r=localStorage.getItem('gn-carnet'); if(r){ const a=JSON.parse(r); if(Array.isArray(a)) CARNET=a; } }catch(e){ cStoreOK=false; } })();
+function cSave(){ try{ localStorage.setItem('gn-carnet',JSON.stringify(CARNET)); cStoreOK=true; }catch(e){ cStoreOK=false; } }
+let cBackup=0, cRestoreMsg=''; try{ cBackup=+localStorage.getItem('gn-backup')||0; }catch(e){}
+try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{}); }catch(e){}
+const BK='GARDE-NEURO-SAUVEGARDE ';
+function backupText(){ return BK+btoa(unescape(encodeURIComponent(JSON.stringify({v:1,at:Date.now(),carnet:CARNET,annuaire:ANNU})))); }
+function restoreFrom(txt){
+  const i=txt.indexOf(BK); if(i<0) return [0,"Ce texte n'est pas une sauvegarde du carnet. Colle le texte complet, qui commence par GARDE-NEURO-SAUVEGARDE."];
+  let d; try{ d=JSON.parse(decodeURIComponent(escape(atob(txt.slice(i+BK.length).trim().split(/\s/)[0])))); }catch(e){ return [0,'La sauvegarde est incomplète ou abîmée. Recopie-la en entier.']; }
+  if(!d||!Array.isArray(d.carnet)) return [0,'La sauvegarde ne contient pas de carnet.'];
+  let na=0; if(Array.isArray(d.annuaire)) d.annuaire.forEach(r=>{ if(!r||!r.n) return; const cur=ANNU.find(x=>x.l===r.l); if(cur&&!cur.n){ cur.n=r.n; na++; } else if(!cur){ ANNU.push({l:r.l,n:r.n}); na++; } }); if(na) aSave();
+  let n=0; d.carnet.forEach(x=>{ if(x&&x.id&&!CARNET.some(y=>y.id===x.id)){ CARNET.push(x); n++; } });
+  cSave(); return [1,(n?n+' fiche'+(n>1?'s':'')+' restaurée'+(n>1?'s':'')+'.':'Toutes les fiches de cette sauvegarde étaient déjà dans le carnet.')+(na?' '+na+' numéro'+(na>1?'s':'')+' de l\'annuaire restauré'+(na>1?'s':'')+'.':'')];
+}
+function tabs(a){ const n=CARNET.filter(e=>!e.traite).length;
+  return `<nav class="tabs" aria-label="Sections"><a href="#"${a==='home'?' aria-current="page"':''}>Outils</a><a href="#arbre"${a==='arbre'?' aria-current="page"':''}>Arbre AVC</a><a href="#carnet"${a==='carnet'?' aria-current="page"':''}>Carnet${n?'<span class="badge">'+n+'</span>':''}</a></nav>`; }
+function clip(b,txt,box){
+  const lab=b.textContent, done=()=>{ b.textContent='Copié'; setTimeout(()=>{ b.textContent=lab; },1500); };
+  const fail=()=>{ const f=document.getElementById(box); if(!f) return; f.innerHTML='<textarea readonly aria-label="Texte à copier"></textarea>'; const ta=f.firstChild; ta.value=txt; ta.focus(); ta.select(); };
+  try{ navigator.clipboard.writeText(txt).then(done,fail); }catch(err){ fail(); }
+}
+
+function treeView(){ treeMode==='full'?treeFull():treeStep(); }
+function treeModes(){ return `<div class="seg" role="group" aria-label="Affichage"><button data-tm="full" aria-pressed="${treeMode==='full'}">Arbres complets</button><button data-tm="step" aria-pressed="${treeMode==='step'}">Pas à pas</button></div>`; }
+function treeFull(){
+  const t=FT[ftKey];
+  app.innerHTML=tabs('arbre')+`<div class="tool-head"><h1>Arbre AVC</h1><p class="muted">Chaque arbre se lit de haut en bas, de la question à la conduite à tenir.</p></div>${treeModes()}
+  <div class="chips ftchips">${FT_ORDER.map(k=>`<button class="chip" data-ft="${k}" aria-pressed="${ftKey===k}">${FT[k].n}</button>`).join('')}</div>
+  <section class="fl" id="ftop"><div class="fl-head"><h2>${t.n}</h2><span class="small muted">${t.d} · ${ftCount(t.b)} issues</span></div>${ftBlocks(t.b)}</section>
+  <div class="legend small"><span><i class="lg ok"></i>Traitement indiqué ou situation rassurante</span><span><i class="lg warn"></i>À discuter, ou pas de traitement</span><span><i class="lg crit"></i>Urgence, geste immédiat</span></div>
+  <p class="note">Arbres rédigés le 18 novembre 2026 d'après la HAS (octobre 2025), l'ESO et la SFNV. Les branches céphalée et vertige sont rédigées de mémoire. Aide à la décision : elle ne remplace ni le neurologue senior ni le protocole du service.</p>`;
+}
+function treeStep(){
+  const cur=treeCur(TP), n=TREE[cur], s=treeState(TP);
+  const crumbs=TP.map((p,k)=>`<button class="crumb" data-tb="${k}"><span>${TREE[p.id].q}</span><b>${TREE[p.id].o[p.i][0]}</b></button>`).join('');
+  let body;
+  if(n.end){ const r=treeLeaf(cur,s); body=`<section class="leaf ${r.lvl||''}" id="tcur"><p class="small muted">Conduite à tenir</p><h2>${r.title}</h2></section>${r.html}`; }
+  else body=`<section class="tq" id="tcur"><h2>${n.q}</h2>${n.h||''}<div class="items">${n.o.map((o,i)=>`<button class="topt" data-to="${i}">${o[0]}</button>`).join('')}</div></section>`;
+  app.innerHTML=tabs('arbre')+`<div class="tool-head"><div class="line"><h1>Arbre AVC</h1>${TP.length?'<button class="ghost small" data-act="treset">Recommencer</button>':''}</div><p class="muted">Du premier appel à la décision, une question à la fois.</p></div>`+treeModes()
+   +(crumbs?`<div class="crumbs" aria-label="Réponses données">${crumbs}</div>`:'')+body
+   +`<p class="note">Arbre rédigé le 16 novembre 2026 d'après la HAS (octobre 2025), l'ESO et la SFNV. C'est une aide à la décision : elle ne remplace ni le neurologue senior ni le protocole du service.</p>`;
+}
+
+let ANNU=[]; try{ const r=localStorage.getItem('gn-annuaire'); if(r){ const a=JSON.parse(r); if(Array.isArray(a)) ANNU=a; } }catch(e){}
+if(!ANNU.length) ANNU=['Neurologue senior','Neuroradiologue interventionnel','Radiologue de garde','Réanimation','Neurochirurgie de recours','Urgences','Laboratoire','Cadre de nuit'].map(l=>({l,n:''}));
+function aSave(){ try{ localStorage.setItem('gn-annuaire',JSON.stringify(ANNU)); }catch(e){} }
+function annuView(){
+  app.innerHTML=`<div class="tool-head"><div class="line"><a class="back" href="${fromId==='carnet'?'#carnet':'#'}">${fromId==='carnet'?'Retour au carnet':'Tous les outils'}</a></div><h1>Annuaire de garde</h1><p class="muted">Les numéros que tu cherches toujours. À remplir une fois.</p></div>
+  <div class="items">${ANNU.map((r,i)=>`<div class="arow"><input data-an="l" data-i="${i}" type="text" autocomplete="off" aria-label="Intitulé de la ligne ${i+1}" placeholder="Qui" value="${esc(r.l)}"><input data-an="n" data-i="${i}" type="tel" autocomplete="off" aria-label="Numéro de la ligne ${i+1}" placeholder="Numéro" value="${esc(r.n)}"><button class="ghost small" data-act="andel" data-i="${i}" aria-label="Retirer la ligne ${i+1}">Retirer</button></div>`).join('')}</div>
+  <button class="ghost wide" data-act="anadd">Ajouter une ligne</button>
+  <p class="note">Enregistré sur cet appareil. « Vider le carnet » ne touche jamais à l'annuaire, et la sauvegarde du carnet contient aussi tes numéros.</p>`;
+}
+function delaysHTML(e){ const d=cDelays(e); return d.length?d.map(x=>`<span class="st on">${x[0]} : ${x[1]}</span>`).join(''):'<span class="small muted">Les délais se calculent dès que deux horaires sont notés.</span>'; }
+function survHTML(e){
+  if(!e.tb) return `<p class="small muted">La surveillance démarre quand tu notes l'heure du bolus.</p>`;
+  const n=e.surv||0, sch=survSchedule(e.tb), nx=n<SURV_N?sch[n]:null, late=nx&&Date.now()>nx;
+  return `<div class="surv ${late?'crit':'ok'}"><b>${nx?(late?'Contrôle en retard, prévu à ':'Prochain contrôle à ')+hhmm(nx):'Surveillance de 24 h terminée'}</b><span class="small muted">${n} fait${n>1?'s':''} sur ${SURV_N}. NIHSS et pression artérielle à chaque passage, sous 180/105.</span></div>
+  <div class="chips">${nx?`<button class="chip" data-ca="survok">Contrôle de ${hhmm(nx)} fait</button>`:''}${n?'<button class="chip sm" data-ca="survundo">Annuler le dernier</button>':''}</div>
+  <details class="card"><summary>Tous les horaires</summary><p class="small sched">${sch.map((t,i)=>`<span class="${i<n?'tdone':''}">${hhmm(t)}</span>`).join(' ')}</p></details>
+  <p class="small muted">L'app ne sonne pas : programme aussi une alarme sur ton téléphone.</p>`;
+}
+function alerteBlock(e){
+  const ns=S.nihss?score(TOOLS.find(x=>x.id==='nihss'),S.nihss):null;
+  return `<section class="fsec"><h2>Horaires de l'alerte</h2>
+   ${ATIMES.map(t=>`<div class="cf"><label for="c-${t[0]}">${t[1]}</label><div class="addrow"><input id="c-${t[0]}" data-ck="${t[0]}" type="time" value="${e[t[0]]?hhmm(e[t[0]]):''}"><button class="ghost" data-ca="tnow" data-k="${t[0]}">Maintenant</button></div></div>`).join('')}
+   <div class="sts" id="cdelais">${delaysHTML(e)}</div>
+   <div class="cf"><label for="c-nihss">NIHSS</label><div class="addrow"><input id="c-nihss" data-ck="nihss" type="text" inputmode="numeric" autocomplete="off" value="${esc(e.nihss||'')}">${ns&&!ns.miss?`<button class="ghost" data-ca="nihssget">Reprendre ${ns.tot}</button>`:'<a class="ghost aslink" href="#nihss">Coter</a>'}</div></div>
+   <div class="cf"><span class="lab">Décision</span><div class="chips">${['Thrombolyse','Thrombectomie','Thrombolyse et thrombectomie','Pas de reperfusion'].map(d=>`<button class="chip" data-ca="dec" data-v="${d}" aria-pressed="${e.dec===d}">${d}</button>`).join('')}</div></div>
+  </section>
+  <section class="fsec"><h2>Surveillance après thrombolyse</h2><div id="csurv">${survHTML(e)}</div></section>`;
+}
+function trameBlock(e){
+  const t=TRAMES.find(x=>x.k===e.trame);
+  return `<section class="fsec"><h2>Trame selon le motif</h2><div class="chips">${TRAMES.map(x=>`<button class="chip" data-ca="trame" data-v="${x.k}" aria-pressed="${e.trame===x.k}">${x.n}</button>`).join('')}</div>
+  ${t?`<div class="cf"><span class="lab">Présent chez ce patient</span><div class="chips">${t.s.map(x=>`<button class="chip sm" data-ca="tsig" data-v="${esc(x)}" aria-pressed="${(e.ts||[]).includes(x)}">${esc(x)}</button>`).join('')}</div></div>
+  <div class="cf"><span class="lab">À prévoir : un appui l'ajoute à la liste « À faire »</span><div class="chips">${t.f.filter(x=>!(e.todos||[]).some(y=>y.x===x)).map(x=>`<button class="chip sm" data-ca="todoquick" data-v="${esc(x)}">+ ${esc(x)}</button>`).join('')||'<span class="small muted">Tout est déjà dans la liste.</span>'}</div></div>
+  <p class="warnbox">${t.r}</p><p class="small muted">Aide-mémoire rédigé de mémoire, à faire valider.</p>`:''}</section>`;
+}
+function cNew(){ const e={id:'p'+Date.now().toString(36)+Math.floor(Math.random()*1e4),t:Date.now(),type:'',todos:[]}; CARNET.push(e); cSave(); cOpen=e.id; cConfirm=''; }
+function cGet(){ return CARNET.find(e=>e.id===cOpen); }
+function cCard(e){
+  const ty=cType(e.type), rest=(e.todos||[]).filter(x=>!x.done).length, late=e.rv&&!e.traite&&Date.now()>e.rv;
+  const nx=e.type==='alerte'&&!e.traite?cSurvNext(e):null, who=esc(cWho(e));
+  const tg=(k,l)=>`<button class="st tap${e[k]?' on':''}" data-ca="qtog" data-id="${e.id}" data-k="${k}" aria-pressed="${!!e[k]}" aria-label="${l} : ${who}">${l}</button>`;
+  return `<div class="ecard${e.traite?' done':''}" style="--gc:${ty[2]}">
+   <button class="eopen" data-ca="open" data-id="${e.id}"><span class="eh"><b>${hhmm(e.t)}</b><span class="etype"><i class="dot"></i>${esc(cLabel(e))}</span>${e.urgent?'<span class="eurg">Urgent</span>':''}</span>
+   <strong>${who}</strong>${e.lieu?`<span class="d">${esc(e.lieu)}</span>`:''}${e.motif?`<span class="d">${esc(e.motif.length>90?e.motif.slice(0,90)+'…':e.motif)}</span>`:''}
+   ${rest||nx||(e.rv&&!e.traite)||e.transmettre?`<span class="sts">${rest?`<span class="st warn">${rest} à faire</span>`:''}${e.rv&&!e.traite?`<span class="st${late?' crit':' warn'}">${late?'À revoir depuis ':'À revoir à '}${hhmm(e.rv)}</span>`:''}${nx?`<span class="st ${Date.now()>nx?'crit':'warn'}">Contrôle à ${hhmm(nx)}</span>`:''}${e.transmettre?'<span class="st on">À transmettre</span>':''}</span>`:''}</button>
+   <div class="qrow">${tg('vu','Vu')}${tg('avis','Avis noté')}${tg('traite','Traité')}</div></div>`;
+}
+function carnetList(){
+  const todo=CARNET.filter(e=>!e.traite).length, done=CARNET.length-todo;
+  const list=carnetSort(CARNET).filter(e=>cFilter==='all'||(cFilter==='todo'?!e.traite:e.traite));
+  const old=CARNET.some(e=>Date.now()-e.t>36*36e5);
+  const f=(k,l)=>`<button class="chip" data-ca="filter" data-v="${k}" aria-pressed="${cFilter===k}">${l}</button>`;
+  app.innerHTML=tabs('carnet')+`<div class="tool-head"><h1>Carnet de garde</h1><p class="muted">Un appel, une fiche. Rien ne se perd jusqu'aux transmissions.</p></div>
+  <button class="start asbtn" data-ca="new">Nouvel appel<span>ouvrir une fiche</span></button>
+  <div class="minirow"><a class="ghost aslink" href="#annuaire">Annuaire</a>${CARNET.length?`<button class="ghost bkbtn${(!cBackup||Date.now()-cBackup>36e5)?' old':''}" data-ca="backup">Sauvegarder<small>${cBackup?'dernière à '+hhmm(cBackup):'jamais faite'}</small></button>`:''}</div>
+  <div id="cbk"></div>
+  ${cStoreOK?'':'<p class="warnbox">Ce navigateur refuse l\'enregistrement : le carnet s\'efface si tu fermes la page. Copie tes transmissions avant de quitter.</p>'}
+  ${CARNET.length?`<div class="chips">${f('todo','À faire ('+todo+')')}${f('done','Terminés ('+done+')')}${f('all','Tous ('+CARNET.length+')')}</div>`:''}
+  <div class="elist">${list.map(cCard).join('')||`<p class="muted">${CARNET.length?'Aucune fiche dans cette vue.':'Aucun appel pour l\'instant. Touche « Nouvel appel » dès que le téléphone sonne.'}</p>`}</div>
+  ${CARNET.length?`<section class="fsec"><h2>Fin de garde</h2><div id="cfb"></div><p class="small muted">Seuls les patients à faire, et ceux marqués « À transmettre », partent dans les transmissions.</p><button class="copy wide" data-ca="copyall">Copier les transmissions</button>
+   ${old?'<p class="warnbox">Des fiches ont plus de 36 heures. Pense à vider le carnet après tes transmissions.</p>':''}
+   ${cConfirm==='wipe'?`<div class="card"><p><b>Effacer les ${CARNET.length} fiches ?</b> C'est définitif. Copie d'abord tes transmissions.</p><div class="chips"><button class="chip danger" data-ca="wipe2">Oui, tout effacer</button><button class="chip" data-ca="cancel">Annuler</button></div></div>`:'<button class="ghost wide" data-ca="wipe">Vider le carnet</button>'}</section>`:''}
+  <details class="restore"${cRestoreMsg?' open':''}><summary>Restaurer une sauvegarde</summary><p class="small muted">Colle le texte copié depuis tes Notes. Les fiches et les numéros s'ajoutent, sans rien effacer.</p><textarea id="c-restore" rows="3" aria-label="Texte de la sauvegarde" placeholder="GARDE-NEURO-SAUVEGARDE …"></textarea><button class="ghost wide" data-ca="restore">Restaurer</button>${cRestoreMsg?`<p class="small"><b>${cRestoreMsg}</b></p>`:''}</details>
+  <p class="note">Les fiches sont enregistrées <b>sur cet appareil seulement</b> : elles ne partent ni sur un serveur ni sur tes autres appareils. Préfère les initiales et le numéro de chambre au nom complet, et vide le carnet après chaque garde.</p>`;
+}
+function cTodos(e){
+  return (e.todos||[]).map((x,i)=>`<div class="todo"><button class="chk" data-ca="todotog" data-i="${i}" aria-pressed="${!!x.done}" aria-label="${x.done?'Fait':'À faire'} : ${esc(x.x)}"></button><span class="${x.done?'tdone':''}">${esc(x.x)}</span><button class="ghost small" data-ca="tododel" data-i="${i}" aria-label="Retirer ${esc(x.x)}">Retirer</button></div>`).join('');
+}
+function carnetEntry(e){
+  const tf=(k,l,ph,area)=>`<div class="cf"><label for="c-${k}">${l}</label>${area?`<textarea id="c-${k}" data-ck="${k}" rows="3" placeholder="${ph||''}">${esc(e[k]||'')}</textarea>`:`<input id="c-${k}" data-ck="${k}" type="text" autocomplete="off" placeholder="${ph||''}" value="${esc(e[k]||'')}">`}</div>`;
+  const tg=(k,l)=>`<button class="chip" data-ca="tog" data-k="${k}" aria-pressed="${!!e[k]}">${l}</button>`;
+  const quick=['Voir le patient','Rappeler','Récupérer l\'imagerie','Récupérer la biologie','Écrire le mot dans le dossier'].filter(q=>!(e.todos||[]).some(x=>x.x===q));
+  app.innerHTML=`<div class="tool-head"><div class="line"><button class="back asbtn" data-ca="back">Carnet</button><label class="ctime"><span>Appel à</span><input id="c-time" data-ck="time" type="time" value="${hhmm(e.t)}" aria-label="Heure de l'appel"></label></div><h1>${esc(e.nom||'Nouvel appel')}</h1><span class="small muted" id="csaved">${cStoreOK?'Enregistré sur cet appareil':'Non enregistré'}</span></div>
+  <section class="fsec"><h2>Pourquoi on m'appelle</h2>
+   <div class="chips">${CTYPES.map(t=>`<button class="chip" data-ca="type" data-v="${t[0]}" aria-pressed="${e.type===t[0]}" style="--gc:${t[2]}"><i class="dot"></i>${t[1]}</button>`).join('')}</div>
+   ${e.type==='avis'?tf('svc','Quel service demande','Endocrino, neurochirurgie, cardio…'):''}
+   <div class="chips">${tg('urgent','Urgent')}${tg('aco','Sous anticoagulant')}</div>
+   ${e.type==='alerte'?`<div class="chips"><a class="chip aslink" href="#alerte">Alerte pas à pas</a><a class="chip aslink" href="#arbre">Arbre AVC</a><button class="chip" data-ca="toentree">Mot d'entrée pré-rempli</button></div>`:''}
+  </section>
+  <section class="fsec">
+   <div class="two nomage"><div class="cf"><label for="c-nom">Patient</label><input id="c-nom" data-ck="nom" type="text" autocomplete="off" placeholder="Initiales ou nom" value="${esc(e.nom||'')}"></div><div class="cf"><label for="c-age">Âge</label><input id="c-age" data-ck="age" type="text" inputmode="numeric" autocomplete="off" placeholder="ans" value="${esc(e.age||'')}"></div></div>
+   <div class="cf"><label for="c-notes">Notes prises au téléphone</label><textarea id="c-notes" class="bignotes" data-ck="notes" placeholder="Tout noter en vrac, trier après. Le micro du clavier permet de dicter.">${esc(e.notes||'')}</textarea></div>
+  </section>
+  ${e.type==='alerte'?alerteBlock(e):''}
+  <section class="fsec"><h2>Le patient</h2>
+   <div class="cf"><span class="lab">Sexe</span><div class="chips"><button class="chip" data-ca="sexe" data-v="Homme" aria-pressed="${e.sexe==='Homme'}">Homme</button><button class="chip" data-ca="sexe" data-v="Femme" aria-pressed="${e.sexe==='Femme'}">Femme</button></div></div>
+   ${tf('lieu','Où','Service, chambre, box')}
+   ${tf('appelant','Appelé par','Nom et numéro de poste')}
+  </section>
+  <section class="fsec"><h2>Ce qu'on me dit</h2>
+   ${tf('motif','Motif et histoire','Patient de 67 ans, chute du membre supérieur droit depuis 14 h…',1)}
+   ${tf('atcd','Antécédents','',1)}
+   ${tf('ttt','Traitement','',1)}
+  </section>
+  ${trameBlock(e)}
+  <section class="fsec"><h2>Ce que je constate et ce que je fais</h2>
+   ${tf('exam','Examen, résultats','NIHSS, constantes, imagerie, biologie',1)}
+   ${tf('concl','Avis donné, conduite tenue','',1)}
+  </section>
+  <section class="fsec"><h2>À faire</h2>
+   <div id="todos">${cTodos(e)}</div>
+   <div class="addrow"><input id="todo-new" type="text" autocomplete="off" placeholder="Ajouter une tâche" aria-label="Nouvelle tâche"><button class="ghost" data-ca="todoadd">Ajouter</button></div>
+   ${quick.length?`<div class="chips">${quick.map(q=>`<button class="chip sm" data-ca="todoquick" data-v="${esc(q)}">+ ${esc(q)}</button>`).join('')}</div>`:''}
+   <div class="cf"><label for="c-rv">À revoir à</label><div class="addrow"><input id="c-rv" data-ck="rv" type="time" value="${e.rv?hhmm(e.rv):''}">${e.rv?'<button class="ghost" data-ca="rvclear">Enlever</button>':''}</div></div>
+  </section>
+  <section class="fsec"><h2>Suivi</h2>
+   <div class="chips">${tg('vu','Patient vu')}${tg('avis','Avis noté dans le dossier')}${tg('traite','Demande traitée')}${tg('transmettre','À transmettre à la relève')}</div>
+   <p class="small muted">« Demande traitée » range la fiche dans les terminés.</p>
+  </section>
+  <section class="fsec"><div id="cfb"></div><button class="copy wide" data-ca="copyone">Copier cette fiche</button>
+   ${cConfirm==='del'?`<div class="card"><p><b>Supprimer cette fiche ?</b> C'est définitif.</p><div class="chips"><button class="chip danger" data-ca="del2">Oui, supprimer</button><button class="chip" data-ca="cancel">Annuler</button></div></div>`:'<button class="ghost wide" data-ca="del">Supprimer la fiche</button>'}
+  </section>`;
+}
+function carnetView(){ const e=cGet(); if(e) carnetEntry(e); else { cOpen=null; carnetList(); } }
+function carnetClick(b){
+  const a=b.dataset.ca, e=cGet(), re=(top)=>{ carnetView(); if(top) window.scrollTo(0,0); };
+  if(a==='new'){ cNew(); re(1); return; }
+  if(a==='open'){ cOpen=b.dataset.id; cConfirm=''; re(1); return; }
+  if(a==='back'){ cOpen=null; cConfirm=''; re(1); return; }
+  if(a==='filter'){ cFilter=b.dataset.v; re(); return; }
+  if(a==='qtog'){ const x=CARNET.find(q=>q.id===b.dataset.id); if(x){ const y=window.scrollY; x[b.dataset.k]=!x[b.dataset.k]; cSave(); carnetView(); window.scrollTo(0,y); } return; }
+  if(a==='backup'){ const txt=backupText(), ok=()=>{ cBackup=Date.now(); try{ localStorage.setItem('gn-backup',cBackup); }catch(e){} b.classList.remove('old'); b.innerHTML='Copiée<small>colle-la dans Notes</small>'; setTimeout(()=>{ b.innerHTML='Sauvegarder<small>dernière à '+hhmm(cBackup)+'</small>'; },2500); };
+    const ko=()=>{ const f=document.getElementById('cbk'); if(!f) return; f.innerHTML='<p class="small muted">Copie impossible : sélectionne ce texte et copie-le.</p><textarea readonly aria-label="Sauvegarde à copier"></textarea>'; const ta=f.querySelector('textarea'); ta.value=txt; ta.focus(); ta.select(); cBackup=Date.now(); try{ localStorage.setItem('gn-backup',cBackup); }catch(e){} };
+    try{ navigator.clipboard.writeText(txt).then(ok,ko); }catch(err){ ko(); } return; }
+  if(a==='restore'){ const t=document.getElementById('c-restore'); cRestoreMsg=restoreFrom(t?t.value:'')[1]; re(); return; }
+  if(a==='copyall'){ clip(b,carnetText(CARNET,Date.now()),'cfb'); return; }
+  if(a==='wipe'){ cConfirm='wipe'; re(); return; }
+  if(a==='cancel'){ cConfirm=''; re(); return; }
+  if(a==='wipe2'){ cBackup=0; try{ localStorage.removeItem('gn-backup'); }catch(e){} CARNET=[]; cSave(); cConfirm=''; re(1); return; }
+  if(!e) return;
+  const keepY=f=>{ const y=window.scrollY; f(); cSave(); carnetView(); window.scrollTo(0,y); };
+  if(a==='type'){ keepY(()=>{ e.type=e.type===b.dataset.v?'':b.dataset.v; }); return; }
+  if(a==='sexe'){ keepY(()=>{ e.sexe=e.sexe===b.dataset.v?'':b.dataset.v; }); return; }
+  if(a==='tog'){ keepY(()=>{ e[b.dataset.k]=!e[b.dataset.k]; }); return; }
+  if(a==='todoadd'||a==='todoquick'){ const inp=document.getElementById('todo-new'), v=a==='todoquick'?b.dataset.v:(inp.value||'').trim(); if(!v) return; keepY(()=>{ (e.todos=e.todos||[]).push({x:v,done:false}); }); return; }
+  if(a==='todotog'){ keepY(()=>{ const x=e.todos[+b.dataset.i]; x.done=!x.done; }); return; }
+  if(a==='tododel'){ keepY(()=>{ e.todos.splice(+b.dataset.i,1); }); return; }
+  if(a==='rvclear'){ keepY(()=>{ delete e.rv; }); return; }
+  if(a==='tnow'){ keepY(()=>{ e[b.dataset.k]=Date.now(); if(b.dataset.k==='t0'){ onset=e.t0; saveOnset(); } }); return; }
+  if(a==='dec'){ keepY(()=>{ e.dec=e.dec===b.dataset.v?'':b.dataset.v; }); return; }
+  if(a==='nihssget'){ keepY(()=>{ e.nihss=String(score(TOOLS.find(x=>x.id==='nihss'),S.nihss).tot); }); return; }
+  if(a==='survok'){ keepY(()=>{ e.surv=Math.min(SURV_N,(e.surv||0)+1); }); return; }
+  if(a==='survundo'){ keepY(()=>{ e.surv=Math.max(0,(e.surv||0)-1); }); return; }
+  if(a==='trame'){ keepY(()=>{ e.trame=e.trame===b.dataset.v?'':b.dataset.v; e.ts=[]; }); return; }
+  if(a==='tsig'){ keepY(()=>{ const s=e.ts=e.ts||[], i=s.indexOf(b.dataset.v); i<0?s.push(b.dataset.v):s.splice(i,1); }); return; }
+  if(a==='copyone'){ clip(b,carnetEntryText(e),'cfb'); return; }
+  if(a==='del'){ cConfirm='del'; keepY(()=>{}); return; }
+  if(a==='del2'){ CARNET=CARNET.filter(x=>x.id!==e.id); cSave(); cOpen=null; cConfirm=''; re(1); return; }
+  if(a==='toentree'){ if(e.age&&!F.age) F.age=e.age; if(e.sexe&&!F.sexe) F.sexe=e.sexe; if(e.atcd&&!F.atcd) F.atcd=e.atcd; if(e.ttt&&!F.ttt) F.ttt=e.ttt; if(e.t0&&!F.h0) F.h0=hhmm(e.t0); if(e.tb&&!F.h1) F.h1=hhmm(e.tb); location.hash='entree'; return; }
+}
+function carnetInput(el){
+  const e=cGet(); if(!e) return; const k=el.dataset.ck;
+  if(k==='time'){ if(!el.value) return; const p=el.value.split(':').map(Number), d=new Date(e.t); d.setHours(p[0],p[1],0,0); e.t=d.getTime(); }
+  else if(k==='rv'){ if(!el.value){ delete e.rv; } else { const p=el.value.split(':').map(Number), d=new Date(); d.setHours(p[0],p[1],0,0); if(d.getTime()<Date.now()-6e4) d.setDate(d.getDate()+1); e.rv=d.getTime(); } }
+  else if(ATIMES.some(t=>t[0]===k)){
+    if(!el.value) delete e[k]; else { const p=el.value.split(':').map(Number), d=new Date(e.t); d.setHours(p[0],p[1],0,0); let x=d.getTime(); if(x>e.t+12*36e5) x-=864e5; if(x<e.t-12*36e5) x+=864e5; e[k]=x; }
+    if(k==='t0'&&e.t0){ onset=e.t0; saveOnset(); }
+    const dl=document.getElementById('cdelais'); if(dl) dl.innerHTML=delaysHTML(e);
+    if(k==='tb'){ const sv=document.getElementById('csurv'); if(sv) sv.innerHTML=survHTML(e); }
+  }
+  else e[k]=el.value;
+  cSave(); const s=document.getElementById('csaved'); if(s) s.textContent=cStoreOK?'Enregistré sur cet appareil':'Non enregistré';
+  if(k==='nom'){ const h=app.querySelector('.tool-head h1'); if(h) h.textContent=el.value||'Nouvel appel'; }
+}
+
+function tool(t){
+  if(t.type==='carnet'){ carnetView(); return; }
+  if(t.type==='arbre'){ treeView(); return; }
+  if(t.type==='annuaire'){ annuView(); return; }
+  if(t.type==='form'){ formTool(t); return; }
+  if(t.type==='mrc'){ mrcTool(t); return; }
+  if(t.type==='ref'){ app.innerHTML=head(t)+t.html; return; }
+  if(t.type==='score'){
+    S[t.id]=S[t.id]||defaults(t); const s=S[t.id];
+    app.innerHTML=head(t,true)+'<div class="items">'+t.items.map((it,i)=>it.yn
+      ?`<button class="tog" data-i="${i}" aria-pressed="${s[i]===1}"><span>${esc(it.l)}${it.h?'<small>'+esc(it.h)+'</small>':''}</span><span class="n">${it.o[1][1]>0?'+':''}${it.o[1][1]}</span></button>`
+      :`<fieldset><legend>${esc(it.l)}${it.h?'<small>'+esc(it.h)+'</small>':''}</legend>${it.o.map((o,k)=>`<button class="opt" data-i="${i}" data-k="${k}" aria-pressed="${s[i]===k}"><span class="n">${o[2]||o[1]}</span><span>${esc(o[0])}</span></button>`).join('')}</fieldset>`).join('')
+      +'</div>'+(t.note?'<p class="note">'+esc(t.note)+'</p>':'')+'<div id="bar">'+scoreBar(t)+'</div>';
+    return;
+  }
+  V[t.id]=V[t.id]||{}; const v=V[t.id];
+  app.innerHTML=head(t,true)+'<div class="items">'+t.inputs.map(f=>`<div class="field"><label for="f-${f.id}">${esc(f.l)}${f.u?' ('+f.u+')':''}${f.h?'<small>'+esc(f.h)+'</small>':''}</label>${f.sel
+    ?`<select id="f-${f.id}" data-f="${f.id}"><option value="">Choisir</option>${f.sel.map(o=>`<option value="${o[0]}"${v[f.id]==o[0]?' selected':''}>${o[1]}</option>`).join('')}</select>`
+    :`<input id="f-${f.id}" data-f="${f.id}" inputmode="decimal" autocomplete="off" value="${v[f.id+'_raw']||''}">`}</div>`).join('')
+    +'</div><div class="card out" id="out" hidden></div>'+(t.note?'<p class="note">'+esc(t.note)+'</p>':'')+'<div id="bar"></div>';
+  calcUpdate(t);
+}
+function calcUpdate(t){
+  const r=t.fn(V[t.id]), out=document.getElementById('out');
+  if(out){ out.hidden=!(r&&r.html); out.innerHTML=r&&r.html||''; }
+  document.getElementById('bar').innerHTML=r?bar(r.v,esc(r.t||''),r.lvl,true,true):bar('–','Renseigne les valeurs','',false);
+}
+function current(){ return TOOLS.find(t=>t.id===location.hash.slice(1)); }
+let homeY=0, onHome=false;
+let lastId='';
+function render(){ const t=current(); fromId=lastId; lastId=t?t.id:''; if(t){ if(onHome) homeY=window.scrollY; tool(t); window.scrollTo(0,0); } else { home(); const y=homeY; window.scrollTo(0,y); requestAnimationFrame(()=>window.scrollTo(0,y)); } onHome=!t; }
+
+app.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return; const t=current(), act=b.dataset.act;
+  if(b.dataset.ca){ carnetClick(b); return; }
+  const tgo=()=>{ treeView(); const c=document.getElementById('tcur'); if(c&&TP.length) c.scrollIntoView({block:'start'}); else window.scrollTo(0,0); };
+  if(b.dataset.tm){ treeMode=b.dataset.tm; treeView(); window.scrollTo(0,0); return; }
+  if(b.dataset.ft){ ftKey=b.dataset.ft; treeView(); window.scrollTo(0,0); return; }
+  if(b.dataset.to!==undefined){ TP.push({id:treeCur(TP),i:+b.dataset.to}); tgo(); return; }
+  if(b.dataset.tb!==undefined){ TP=TP.slice(0,+b.dataset.tb); tgo(); return; }
+  if(act==='treset'){ TP=[]; tgo(); return; }
+  if(act==='now'){ onset=Date.now(); saveOnset(); document.getElementById('chrono').innerHTML=chronoHTML(); return; }
+  if(act==='clear'){ onset=null; saveOnset(); document.getElementById('chrono').innerHTML=chronoHTML(); return; }
+  if(!t) return;
+  if(act==='anadd'){ ANNU.push({l:'',n:''}); aSave(); annuView(); return; }
+  if(act==='andel'){ ANNU.splice(+b.dataset.i,1); aSave(); annuView(); return; }
+  if(act==='all5'){ let n=0; MRC.forEach(s=>s[1].forEach(()=>{ M[n+'d']=5; M[n+'g']=5; n++; })); tool(t); return; }
+  if(act==='reset'){ if(t.type==='mrc') M={}; if(t.type==='form') Object.keys(F).forEach(k=>delete F[k]); delete S[t.id]; delete V[t.id]; tool(t); return; }
+  if(act==='copy'){
+    let txt=''; if(t.type==='mrc') txt=mrcText(M); else if(t.type==='form') txt=motEntree(F,nihssTxt()); else if(t.type==='score'){ const s=S[t.id]; txt=copyText(t,s,score(t,s).tot); } else { const r=t.fn(V[t.id]); txt=r?r.copy:''; }
+    const done=()=>{ b.textContent='Copié'; setTimeout(()=>{ b.textContent='Copier'; },1500); };
+    const fail=()=>{ const f=document.getElementById('fallback'); f.innerHTML='<textarea readonly aria-label="Texte à copier"></textarea>'; const ta=f.firstChild; ta.value=txt; ta.focus(); ta.select(); };
+    try{ navigator.clipboard.writeText(txt).then(done,fail); }catch(err){ fail(); }
+    return;
+  }
+  if(b.dataset.mk){ const k=b.dataset.mk, v=+b.dataset.mv; if(M[k]===v) delete M[k]; else M[k]=v;
+    b.parentNode.querySelectorAll('.g').forEach(c=>c.setAttribute('aria-pressed',+c.dataset.mv===M[k])); document.getElementById('bar').innerHTML=mrcBar(); return; }
+  if(b.dataset.sk){ const k='side_'+b.dataset.sk; F[k]=F[k]===b.dataset.sv?'':b.dataset.sv; const q=b.closest('.q'); q.innerHTML=qInner(fieldOf(q.dataset.k)); formUpdate(); return; }
+  if(b.dataset.fk){
+    const k=b.dataset.fk, v=b.dataset.fv;
+    if(b.dataset.multi){ const a=F[k]||(F[k]=[]), i=a.indexOf(v); i<0?a.push(v):a.splice(i,1); }
+    else F[k]=F[k]===v?'':v;
+    const q=b.closest('.q'); q.innerHTML=qInner(fieldOf(k)); const o=q.querySelector('.other'); if(o&&v==='Autre') o.focus();
+    formUpdate(); return;
+  }
+  if(b.dataset.i!==undefined&&t.type==='score'){
+    const i=+b.dataset.i, s=S[t.id];
+    s[i]=b.classList.contains('tog')?(s[i]===1?0:1):+b.dataset.k;
+    if(b.classList.contains('tog')) b.setAttribute('aria-pressed',s[i]===1);
+    else b.parentNode.querySelectorAll('.opt').forEach(o=>o.setAttribute('aria-pressed',+o.dataset.k===s[i]));
+    document.getElementById('bar').innerHTML=scoreBar(t);
+  }
+});
+app.addEventListener('input',e=>{
+  const el=e.target, t=current();
+  if(el.dataset.ck){ carnetInput(el); return; }
+  if(el.dataset.an){ ANNU[+el.dataset.i][el.dataset.an]=el.value; aSave(); return; }
+  if(el.id==='q'){ q=el.value; document.getElementById('list').innerHTML=listHTML(); return; }
+  if(el.id==='onset') return;
+  if(t&&el.dataset.ff){ F[el.dataset.ff]=el.value.trim(); formUpdate(); return; }
+  if(t&&el.dataset.f){ const v=V[t.id]; v[el.dataset.f+'_raw']=el.value; v[el.dataset.f]=parseFloat(String(el.value).replace(',','.')); calcUpdate(t); }
+});
+app.addEventListener('change',e=>{
+  if(e.target.dataset.ck){ carnetInput(e.target); return; }
+  if(e.target.dataset.ff){ F[e.target.dataset.ff]=e.target.value.trim(); formUpdate(); return; }
+  if(e.target.id!=='onset'||!e.target.value) return;
+  const [h,m]=e.target.value.split(':').map(Number), d=new Date(); d.setHours(h,m,0,0);
+  if(d.getTime()>Date.now()+6e4) d.setDate(d.getDate()-1);
+  onset=d.getTime(); saveOnset(); document.getElementById('chrono').innerHTML=chronoHTML();
+});
+app.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.id==='todo-new'){ e.preventDefault(); const b=app.querySelector('[data-ca=todoadd]'); if(b) carnetClick(b); const n=document.getElementById('todo-new'); if(n) n.focus(); } });
+window.addEventListener('hashchange',render);
+setInterval(()=>{ const sv=document.getElementById('csurv'), ce=cGet(); if(sv&&ce&&ce.tb) sv.innerHTML=survHTML(ce);
+  const c=document.getElementById('chrono'); if(c&&onset&&document.activeElement.id!=='onset') c.innerHTML=chronoHTML(); },30000);
+render();
+try{ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&!/claude\.ai|claudeusercontent/.test(location.hostname)) navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){}
+</script>
+</body>
+</html>
