@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Garde neuro">
 <title>Garde neuro</title>
@@ -11,6 +11,12 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-512.png">
+
+
+
+
+
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
@@ -265,6 +271,116 @@ a.ghost{text-decoration:none;display:inline-flex;align-items:center;justify-cont
 #fallback textarea{width:100%;height:110px;font:inherit;font-size:.85rem;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px}
 @media (max-width:380px){ h1{font-size:2rem} .elapsed{font-size:2.8rem} .big{font-size:2rem} }
 @media (prefers-reduced-motion:no-preference){ .opt,.tog{transition:background-color .12s,border-color .12s} }
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(3,1fr);background:color-mix(in srgb,var(--surface) 92%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+.tabbar a{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:50px;justify-content:center;text-decoration:none;color:var(--muted);font-size:.74rem;font-weight:600}
+.tabbar svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabbar a[aria-current="page"]{color:var(--accent)}
+.tabbar .badge{position:absolute;top:2px;left:calc(50% + 8px);font-style:normal;background:var(--crit);color:#fff;font-size:.68rem;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px}
+.list a{padding:11px 14px}
+.nsbox{margin-top:12px;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:4px 14px}
+.nsbox[open]{padding-bottom:12px}
+.nsbox summary{display:flex;align-items:center;gap:12px;min-height:50px;cursor:pointer;list-style:none}
+.nsbox summary::-webkit-details-marker{display:none}
+.nsbox summary::after{content:"";margin-left:auto;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-3px);transition:transform .15s}
+.nsbox[open] summary::after{transform:rotate(-135deg)}
+.nsti{font-weight:800;font-family:var(--display)}
+.nssum{display:flex;align-items:baseline;gap:8px;font-size:.88rem}
+.nstot{font-size:1.35rem;font-family:var(--display)} .nstot.ok{color:var(--ok)} .nstot.warn{color:var(--warn)} .nstot.crit{color:var(--crit)}
+.nsl-wrap{display:flex;flex-direction:column;margin-top:10px}
+.nsit{border-top:1px solid var(--line);padding:9px 0}
+.nsh{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px}
+.nsl{font-weight:700;font-size:.92rem}
+.nsopts{display:flex;gap:6px;flex-shrink:0}
+.nso{width:42px;height:42px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);font-weight:700;font-size:1rem;color:var(--ink)}
+.nso[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.nsd{margin:5px 0 0;font-size:.8rem;color:var(--muted);line-height:1.35;display:flex;flex-direction:column;gap:1px}
+.nsd b{color:var(--ink)}
+.g-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.g-bar>div:first-child{display:flex;flex-direction:column}
+.g-zoom{display:flex;align-items:center;gap:6px}.g-zoom .ghost{min-width:44px}
+#gzv{font-size:.8rem;color:var(--muted);min-width:42px;text-align:center}
+.gwrap{overflow:auto;-webkit-overflow-scrolling:touch;background:var(--surface);border:1px solid var(--line);border-radius:16px;height:calc(100vh - 330px);min-height:360px;margin:0 -8px;touch-action:pan-x pan-y}
+.gin{display:inline-flex;flex-direction:column;align-items:center;gap:6px;padding:18px 14px 40px;min-width:100%}
+.g-sec{display:flex;flex-direction:column;align-items:center}
+.g-then{font-size:.75rem;font-weight:700;color:var(--muted);border:1.5px dashed var(--line);border-radius:999px;padding:3px 12px;margin:14px 0 4px}
+.gin ul{display:flex;justify-content:center;list-style:none;margin:0;padding:18px 0 0;position:relative}
+.gin ul::before{content:"";position:absolute;top:0;left:50%;height:18px;border-left:2px solid var(--gl)}
+.gin li{position:relative;display:flex;flex-direction:column;align-items:center;padding:18px 7px 0}
+.gin li::before,.gin li::after{content:"";position:absolute;top:0;width:50%;height:18px;border-top:2px solid var(--gl)}
+.gin li::before{right:50%}.gin li::after{left:50%;border-left:2px solid var(--gl)}
+.gin li:first-child::before,.gin li:last-child::after{border:0}
+.gin li:last-child::before{border-right:2px solid var(--gl);border-top-right-radius:10px}
+.gin li:first-child::after{border-top-left-radius:10px}
+.gin li:only-child{padding-top:0}.gin li:only-child::before,.gin li:only-child::after{display:none}
+.gin ul.g-root{padding-top:0}.gin ul.g-root::before{display:none}
+.gin ul.g-root>li{padding-top:0}.gin ul.g-root>li::before,.gin ul.g-root>li::after{display:none}
+.gin{--gl:#B9C1DC}
+@media (prefers-color-scheme:dark){.gin{--gl:#3A4573}}
+.g-lab{max-width:150px;text-align:center;font-size:.74rem;line-height:1.25;font-weight:600;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:4px 8px;color:var(--ink)}
+.g-stub{display:block;width:2px;height:10px;background:var(--gl)}
+.g-n{display:flex;flex-direction:column;align-items:center;gap:2px;width:max-content;min-width:96px;max-width:170px;text-align:center;font:inherit;font-size:.82rem;line-height:1.25;font-weight:700;border-radius:12px;padding:9px 11px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
+.g-n small{font-weight:500;font-size:.68rem;opacity:.75}
+.g-q{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.g-s{background:var(--paper)}
+.g-e.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--surface))}
+.g-e.warn{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,var(--surface))}
+.g-e.crit{border-color:var(--crit);background:color-mix(in srgb,var(--crit) 14%,var(--surface))}
+.g-g{border-style:dashed;border-color:var(--accent);color:var(--accent)}
+button.g-n{cursor:pointer}
+.lg.q{background:var(--accent)}
+.gsheet{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:0 10px calc(10px + env(safe-area-inset-bottom));display:flex;justify-content:center}
+.gsheet[hidden]{display:none}
+.gs-in{width:100%;max-width:620px;max-height:62vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--accent);border-radius:18px;padding:14px 16px;box-shadow:0 -12px 40px rgb(18 24 54 / .25)}
+.gs-in.ok{border-top-color:var(--ok)}.gs-in.warn{border-top-color:var(--warn)}.gs-in.crit{border-top-color:var(--crit)}.gs-in.s{border-top-color:var(--muted)}
+.gs-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.gs-in ul{padding-left:20px;margin:10px 0 0}.gs-in li{margin:4px 0}.gs-in p{margin:8px 0 0;font-size:.92rem}
+.ftchips{flex-wrap:nowrap;overflow-x:auto;margin:0 -16px;padding:2px 16px 4px;scrollbar-width:none}
+.ftchips::-webkit-scrollbar{display:none}
+.ftchips .chip{flex-shrink:0}
+.gwrap{height:calc(100vh - 290px)}
+.start.alt{background:var(--surface);color:var(--accent);border:2px solid var(--accent)}
+.hlist>summary,.hout>summary{font-weight:700;font-family:var(--display);font-size:1.05rem;cursor:pointer;padding:4px 0 10px}
+.hout>summary{font-size:.92rem;color:var(--muted);padding-top:10px}
+.hcard{display:flex;flex-direction:column;gap:4px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:6px 16px 16px 6px;padding:12px 14px;font:inherit;color:inherit}
+.hcard.done{opacity:.6}
+.hcard .eh{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.hcard .d{font-size:.86rem;color:var(--muted)}
+.hid2{grid-template-columns:1fr 1fr}
+.hevol{min-height:40vh}
+.hrows{display:flex;flex-direction:column;gap:6px}
+.hrow{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:4px 10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 8px}
+.hrow .hres{grid-column:1/-1;font-size:.92rem}
+.hn{font-weight:600;font-size:.95rem}
+.hst{display:flex;align-items:center;gap:7px;background:none;border:0;padding:4px 2px;min-height:40px;font:inherit;font-size:.74rem;font-weight:700;color:var(--muted);width:96px}
+.hst i{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;position:relative}
+.s1 .hst{color:var(--warn)}.s1 .hst i{border-color:var(--warn);background:conic-gradient(var(--warn) 0 50%,transparent 50% 100%)}
+.s2 .hst{color:var(--ok)}.s2 .hst i{border-color:var(--ok);background:var(--ok)}
+.hdel{min-height:36px;min-width:36px;padding:0 8px;font-size:1.1rem}
+.ttlist{display:flex;flex-direction:column;gap:8px}
+.ttrow{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.ttl{display:grid;grid-template-columns:minmax(0,1fr) 92px 40px;gap:6px}.ttl input{min-width:0;width:100%}
+.hevol{font:inherit;width:100%}
+.ttp{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.ttp input{flex:1;min-width:140px;font-size:.88rem}
+.tp{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 11px;min-height:34px;font:inherit;font-size:.82rem;color:var(--ink)}
+.tp[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.ttrow input,.hres,.hevol{background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;min-height:42px;color:inherit}
+.hevol{background:var(--surface);border-radius:12px;padding:12px}
+.hn small{display:block;font-weight:500;font-size:.76rem;color:var(--muted)}
+.hst{width:104px}
+.s1 .hst{color:var(--crit)}.s1 .hst i{border-color:var(--crit);border-style:dashed}
+.s2 .hst{color:var(--warn)}.s2 .hst i{border-color:var(--warn);background:conic-gradient(var(--warn) 0 50%,transparent 50% 100%)}
+.s3 .hst{color:var(--ok)}.s3 .hst i{border-color:var(--ok);background:var(--ok)}
+.s3 .hst i::after{content:"";position:absolute;left:7px;top:3px;width:5px;height:10px;border:solid var(--surface);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.s0 .hst{opacity:.75}
+.hback{grid-column:1/-1;justify-self:start;background:none;border:0;padding:2px 0;font-size:.76rem;color:var(--muted);text-decoration:underline;font:inherit;font-size:.76rem}
+.ctgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.ctf{display:flex;flex-direction:column;gap:2px;font-size:.74rem;font-weight:700;color:var(--muted)}
+.ctf input{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px;min-height:42px;width:100%;min-width:0;font-size:.95rem;color:var(--ink)}
+.hroom{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;color:var(--muted)}
+.hroom select{font-family:var(--display);font-weight:800;font-size:1.4rem;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:4px 10px;min-height:46px}
+.hrm{font-family:var(--display);font-weight:800;font-size:1.05rem;color:var(--accent);background:var(--tint);border-radius:8px;padding:2px 8px;min-width:48px;text-align:center}
+.hcard .eh strong{flex:1}
 </style>
 </head>
 <body>
@@ -315,6 +431,119 @@ const TOOLS=[
  ],
  interp:t=>t===0?['Pas de déficit coté','ok']:t<=4?['AVC mineur','ok']:t<=15?['AVC modéré','warn']:t<=20?['AVC modéré à sévère','crit']:['AVC sévère','crit'],
  copy:(t,s,tot)=>'NIHSS à '+tot+' :\n'+t.items.map((it,i)=>'- '+it.l+(it.h&&!/secondes/.test(it.h)?' ('+it.h.toLowerCase()+')':'')+' : '+(it.o[s[i]][2]||it.o[s[i]][1])).join('\n')},
+
+{id:'dn4',g:'lit',n:'DN4',d:'Douleur neuropathique, 10 questions',type:'score',max:10,
+ items:[
+  yn('Brûlure',1,'Interrogatoire : la douleur a-t-elle ce caractère ?'),
+  yn('Sensation de froid douloureux'),
+  yn('Décharges électriques'),
+  yn('Fourmillements',1,'Interrogatoire : symptôme associé, dans la même zone'),
+  yn('Picotements'),
+  yn('Engourdissement'),
+  yn('Démangeaisons'),
+  yn('Hypoesthésie au tact',1,'Examen, dans la zone douloureuse'),
+  yn('Hypoesthésie à la piqûre'),
+  yn('Douleur provoquée ou augmentée par le frottement')
+ ],
+ interp:t=>t>=4?['En faveur d\'une douleur neuropathique','warn']:['Pas en faveur d\'une douleur neuropathique','ok'],
+ note:"Bouhassira, 2005. Score de 4 ou plus sur 10 : en faveur d'une douleur neuropathique (sensibilité 83 %, spécificité 90 %). Les 7 questions d'interrogatoire seules (DN4-interview) se lisent avec un seuil de 3 sur 7."},
+
+{id:'garches',n:'Score de Garches',d:'Score moteur de la myasthénie, sur 100',type:'calc',
+ inputs:[
+  {id:'bras',l:'Bras tendus à l\'horizontale (Barré)',u:'secondes',h:'1 point par 10 secondes, maximum 15 points à 150 secondes'},
+  {id:'jambes',l:'Jambes tenues, couché sur le dos (Mingazzini)',u:'secondes',h:'Cuisses et jambes à 90°. 1 point par 5 secondes, maximum 15 points à 75 secondes'},
+  {id:'tete',l:'Flexion de la tête, couché sur le dos',sel:[['10','Contre résistance (10)'],['5','Sans résistance (5)'],['0','Impossible (0)']]},
+  {id:'assis',l:'Passage de couché à assis',sel:[['10','Sans l\'aide des mains (10)'],['5','Avec l\'aide des mains (5)'],['0','Impossible (0)']]},
+  {id:'oculo',l:'Oculomotricité extrinsèque',sel:[['10','Normale (10)'],['5','Ptosis isolé (5)'],['0','Diplopie (0)']]},
+  {id:'occl',l:'Occlusion palpébrale',sel:[['10','Complète (10)'],['5','Incomplète, cornée recouverte (5)'],['0','Incomplète, cornée découverte (0)']]},
+  {id:'mast',l:'Mastication',sel:[['10','Normale (10)'],['5','Faible (5)'],['0','Impossible (0)']]},
+  {id:'degl',l:'Déglutition',sel:[['10','Normale (10)'],['5','Gênée, sans fausse route (5)'],['0','Fausses routes (0)']]},
+  {id:'phon',l:'Phonation',sel:[['10','Voix normale (10)'],['5','Voix nasonnée (5)'],['0','Aphonie ou voix inintelligible (0)']]}],
+ fn:v=>{ const K=['tete','assis','oculo','occl','mast','degl','phon'];
+  if(!(v.bras>=0&&v.jambes>=0&&K.every(k=>Number.isFinite(v[k])))) return null;
+  const b=Math.min(15,Math.floor(v.bras/10)), j=Math.min(15,Math.floor(v.jambes/5)), t=b+j+K.reduce((a,k)=>a+v[k],0);
+  const det='bras '+b+'/15, jambes '+j+'/15, tête '+v.tete+', couché-assis '+v.assis+', oculomotricité '+v.oculo+', occlusion '+v.occl+', mastication '+v.mast+', déglutition '+v.degl+', phonation '+v.phon;
+  return {v:t+'/100',t:'Bras '+b+'/15, jambes '+j+'/15',lvl:t===100?'ok':v.degl===0||v.phon===0?'crit':'warn',copy:'Score de Garches : '+t+'/100 ('+det+')'}; },
+ note:"Gajdos, 1983. 100 = force normale. Il n'y a pas de seuil diagnostique : on suit l'évolution d'un examen à l'autre. Fausses routes, troubles de la phonation ou dyspnée : chercher une crise myasthénique (capacité vitale, avis réanimation)."},
+
+{id:'mgadl',n:'MG-ADL',d:'Retentissement de la myasthénie au quotidien, sur 24',type:'score',max:24,
+ items:[
+  {l:'Parole',o:[['Normale',0],['Voix nasonnée ou mal articulée par moments',1],['Voix nasonnée ou mal articulée en permanence, mais compréhensible',2],['Difficile à comprendre',3]]},
+  {l:'Mastication',o:[['Normale',0],['Fatigue avec les aliments solides',1],['Fatigue avec les aliments mous',2],['Sonde gastrique',3]]},
+  {l:'Déglutition',o:[['Normale',0],['Fausses routes rares',1],['Fausses routes fréquentes, alimentation adaptée',2],['Sonde gastrique',3]]},
+  {l:'Respiration',o:[['Normale',0],["Essoufflement à l'effort",1],['Essoufflement au repos',2],['Ventilation mécanique',3]]},
+  {l:'Se brosser les dents ou se coiffer',o:[['Aucune gêne',0],['Effort supplémentaire, sans pause',1],['Pauses nécessaires',2],["Impossible pour l'une des deux",3]]},
+  {l:"Se lever d'une chaise",o:[['Aucune gêne',0],["Gêne légère, s'aide parfois des bras",1],["Gêne modérée, s'aide toujours des bras",2],["Gêne sévère, a besoin d'aide",3]]},
+  {l:'Vision double',o:[['Jamais',0],['Parfois, pas tous les jours',1],['Tous les jours, pas en permanence',2],['En permanence',3]]},
+  {l:'Chute de la paupière',o:[['Jamais',0],['Parfois, pas tous les jours',1],['Tous les jours, pas en permanence',2],['En permanence',3]]}
+ ],
+ interp:t=>t===0?['Pas de symptôme myasthénique','ok']:['À comparer au score précédent','warn'],
+ note:"Wolfe, 1999. Questionnaire rempli avec le patient, sur ses symptômes récents. Une baisse de 2 points ou plus est considérée comme une amélioration significative. Respiration ou déglutition cotées 2 ou 3 : penser à la crise myasthénique."},
+
+{id:'egris',n:'EGRIS',d:'Risque de ventilation dans le Guillain-Barré, de 0 à 7',type:'score',max:7,
+ items:[
+  {l:"Délai entre le début du déficit et l'admission",o:[['Plus de 7 jours',0],['4 à 7 jours',1],['3 jours ou moins',2]]},
+  {l:"Atteinte faciale ou bulbaire à l'admission",o:[['Absente',0],['Présente',1]]},
+  {l:"Score MRC somme à l'admission",h:'Sur 60, voir le testing moteur',o:[['51 à 60',0],['41 à 50',1],['31 à 40',2],['21 à 30',3],['20 ou moins',4]]}
+ ],
+ interp:t=>t<=2?['Risque faible de ventilation dans la semaine','ok']:t<=4?['Risque intermédiaire','warn']:['Risque élevé de ventilation dans la semaine','crit'],
+ note:"Walgaard, 2010 ; validé dans la cohorte internationale IGOS (2022). Le risque estimé de ventilation dans la première semaine va de 1 % à 90 % selon le score. Surveiller la capacité vitale : règle des 20/30/40 (capacité vitale < 20 mL/kg, pression inspiratoire maximale > −30 cmH2O, pression expiratoire maximale < 40 cmH2O)."},
+
+{id:'hughes',n:'Handicap du Guillain-Barré',d:'Échelle de Hughes, de 0 à 6',type:'score',max:6,
+ items:[{l:'Niveau fonctionnel',o:[['Pas de symptôme',0],['Symptômes mineurs, capable de courir',1],['Marche 10 mètres sans aide, ne peut pas courir',2],['Marche 10 mètres avec une aide (canne, déambulateur, soutien)',3],['Alité ou au fauteuil',4],['Ventilation assistée, au moins une partie de la journée',5],['Décès',6]]}],
+ interp:t=>t<=2?['Marche seul','ok']:t<=4?['Ne marche pas seul','warn']:['Atteinte respiratoire ou décès','crit'],
+ note:"Hughes, 1978 (GBS disability score). Il sert à suivre l'évolution et entre dans les scores pronostiques du Guillain-Barré."},
+
+{id:'four',n:'Score FOUR',d:'Coma, y compris chez le patient intubé, de 0 à 16',type:'score',max:16,
+ items:[
+  {l:'Réponse oculaire',o:[["Paupières ouvertes ou ouvertes sur ordre, suit du regard ou cligne sur ordre",4],['Paupières ouvertes, ne suit pas du regard',3],['Paupières fermées, ouverture à la voix forte',2],['Paupières fermées, ouverture à la douleur',1],['Paupières fermées malgré la douleur',0]]},
+  {l:'Réponse motrice',o:[['Fait un signe sur ordre : pouce levé, poing, signe de paix',4],['Localise la douleur',3],['Flexion à la douleur',2],['Extension à la douleur',1],['Aucune réponse à la douleur, ou état de mal myoclonique',0]]},
+  {l:'Réflexes du tronc cérébral',o:[['Réflexes photomoteurs et cornéens présents',4],['Une pupille dilatée et aréactive',3],['Réflexes photomoteurs ou cornéens absents',2],['Réflexes photomoteurs et cornéens absents',1],['Réflexes photomoteurs, cornéens et de toux absents',0]]},
+  {l:'Respiration',o:[['Non intubé, respiration régulière',4],['Non intubé, respiration de Cheyne-Stokes',3],['Non intubé, respiration irrégulière',2],['Intubé, respire au-dessus de la fréquence du respirateur',1],['Respire à la fréquence du respirateur, ou apnée',0]]}
+ ],
+ interp:t=>t===16?['Pas de trouble de conscience coté','ok']:t===0?['Score nul : toutes les réponses abolies','crit']:['Trouble de conscience : suivre l\'évolution','warn'],
+ note:"Wijdicks, 2005. Contrairement au Glasgow, il se cote chez le patient intubé et repère le syndrome d'enfermement (le patient suit du regard ou cligne sur ordre). Un score de 0 fait discuter une mort encéphalique."},
+
+{id:'4at',n:'4AT',d:'Dépistage rapide du syndrome confusionnel, sur 12',type:'score',max:12,
+ items:[
+  {l:'Vigilance',h:"Observer le patient pendant l'évaluation",o:[["Normale, ou somnolence légère de moins de 10 secondes au réveil",0],['Nettement anormale : somnolence marquée ou agitation',4]]},
+  {l:'AMT4',h:'Âge, date de naissance, lieu, année en cours',o:[['Aucune erreur',0],['Une erreur',1],['Deux erreurs ou plus, ou non testable',2]]},
+  {l:'Attention',h:"Les mois de l'année à l'envers, à partir de décembre",o:[['7 mois ou plus sans erreur',0],["Commence mais moins de 7 mois, ou refuse",1],['Non testable : trop somnolent ou inattentif pour commencer',2]]},
+  {l:'Changement aigu ou évolution fluctuante',h:"Vigilance, cognition, autre fonction mentale : apparu dans les 2 dernières semaines et encore présent dans les 24 dernières heures",o:[['Non',0],['Oui',4]]}
+ ],
+ interp:t=>t>=4?['Syndrome confusionnel possible','crit']:t>=1?['Trouble cognitif possible','warn']:['Confusion ou trouble cognitif sévère peu probables','ok'],
+ note:"MacLullich, the4AT.com. Moins de 2 minutes, sans formation. Un score de 4 ou plus n'est pas un diagnostic : il impose un examen clinique et la recherche d'une cause. Tenir compte d'une aphasie ou d'une surdité."},
+
+{id:'stess',n:'STESS',d:"Pronostic de l'état de mal épileptique, de 0 à 6",type:'score',max:6,
+ items:[
+  {l:'Conscience',o:[['Vigilant ou somnolent',0],['Stuporeux ou comateux',1]]},
+  {l:'Type de crise le plus grave',o:[['Crise focale, absence ou myoclonies',0],['Crise généralisée convulsive',1],['État de mal non convulsif dans le coma',2]]},
+  {l:'Âge',o:[['Moins de 65 ans',0],['65 ans ou plus',2]]},
+  {l:'Antécédent de crises',o:[['Oui',0],['Non ou inconnu',1]]}
+ ],
+ interp:t=>t>=3?['Pronostic défavorable : mortalité hospitalière plus élevée','crit']:['Pronostic plus favorable','ok'],
+ note:"Rossetti, 2008. Valable pour l'état de mal non anoxique. Un score de 0 à 2 a une très bonne valeur prédictive de survie ; à partir de 3, le risque de décès est nettement plus élevé. Il ne change pas le traitement d'urgence : voir la fiche état de mal."},
+
+{id:'hunthess',n:'Hunt et Hess',d:"Gravité clinique de l'hémorragie méningée, grades I à V",type:'score',max:5,
+ items:[{l:'État clinique',o:[['Asymptomatique, ou céphalée minime et raideur de nuque légère',1],['Céphalée modérée à sévère, raideur de nuque, pas de déficit sauf atteinte d\'un nerf crânien',2],['Somnolence, confusion ou déficit focal léger',3],['Stupeur, hémiparésie modérée à sévère, rigidité de décérébration débutante possible',4],['Coma profond, rigidité de décérébration, aspect moribond',5]],d:-1}],
+ verdict:s=>{ const g=['I','II','III','IV','V'][s[0]]; return s[0]<=1?['Grade '+g+' : bon grade clinique','ok']:s[0]===2?['Grade '+g+' : grade intermédiaire','warn']:['Grade '+g+' : mauvais grade clinique','crit']; },
+ note:"Hunt et Hess, 1968. On ajoute classiquement un grade en cas de maladie systémique grave (HTA, diabète, athérome sévère, BPCO) ou de vasospasme à l'angiographie. La WFNS et le Fisher modifié sont dans la fiche hémorragie méningée."},
+
+{id:'spetzler',n:'Spetzler-Martin',d:'Risque chirurgical d\'une malformation artério-veineuse, grades I à V',type:'score',max:5,
+ items:[
+  {l:'Taille du nidus',h:'Plus grand diamètre en angiographie',d:-1,o:[['Moins de 3 cm',1],['3 à 6 cm',2],['Plus de 6 cm',3]]},
+  {l:'Zone éloquente adjacente',h:'Cortex sensitivo-moteur, du langage ou visuel, thalamus, hypothalamus, capsule interne, tronc cérébral, pédoncules et noyaux du cervelet',o:[['Non',0],['Oui',1]]},
+  {l:'Drainage veineux',o:[['Superficiel uniquement',0],['Profond',1]]}
+ ],
+ verdict:s=>{ const t=[1,2,3][s[0]]+s[1]+s[2], g=['I','II','III','IV','V'][t-1]; return t<=2?['Grade '+g+' : risque chirurgical faible','ok']:t===3?['Grade '+g+' : risque intermédiaire','warn']:['Grade '+g+' : risque chirurgical élevé','crit']; },
+ note:"Spetzler et Martin, 1986. Le grade est la somme des points. Il estime le risque de la chirurgie, pas celui de l'embolisation ou de la radiochirurgie. Le grade VI désigne une malformation inopérable."},
+
+{id:'epworth',n:"Échelle d'Epworth",d:'Somnolence diurne, sur 24',type:'score',max:24,
+ items:[
+  'Assis en train de lire','En regardant la télévision','Assis, inactif, dans un lieu public (cinéma, réunion)',"Passager d'une voiture roulant sans arrêt pendant une heure","Allongé l'après-midi quand les circonstances le permettent",'Assis en parlant avec quelqu\'un','Assis au calme après un repas sans alcool','Au volant, arrêté quelques minutes dans un embouteillage'
+ ].map(l=>({l,o:[['Ne somnolerait jamais',0],['Faible chance de s\'endormir',1],['Chance moyenne',2],['Forte chance',3]]})),
+ interp:t=>t<=10?['Pas de somnolence diurne excessive','ok']:t<=15?['Somnolence diurne excessive','warn']:['Somnolence diurne sévère','crit'],
+ note:"Johns, 1991. Le patient estime ses chances de s'assoupir dans chaque situation, dans la vie récente. Normal jusqu'à 10 ; 11 ou plus : somnolence excessive."},
 
 {id:'thrombolyse',g:'alerte',n:'Contre-indications à la thrombolyse',d:'Liste à cocher avant le bolus',type:'score',unit:'cochée(s)',
  items:[
@@ -624,9 +853,11 @@ const LAYOUT=[
  ['alerte','Alerte thrombolyse','#D8404F',['alerte','entree','nihss','thrombolyse','dose','ta','aspects','thrombectomie','complications']],
  ['reco','Reconnaître et trier','#E0871B',['befast','rosier','race','hints','mimics']],
  ['ait','AIT et AVC mineur','#C29A12',['abcd2','dapt']],
- ['hemo','Hématome et hémorragie méningée','#9A48C4',['ich','abc2','glasgow','reversion','hsa']],
+ ['hemo','Hématome et hémorragie méningée','#9A48C4',['ich','abc2','glasgow','reversion','hsa','hunthess','spetzler']],
  ['urg','Autres urgences','#D2527F',['malin','tvc','eme','cam']],
- ['lit','Au lit du patient','#17988A',['mrc','guss','a2ds2','mrs']],
+ ['coma','Coma, confusion, épilepsie','#0F8F6F',['four','4at','stess']],
+ ['nm','Neuromusculaire','#C2541F',['garches','mgadl','egris','hughes']],
+ ['lit','Au lit du patient','#17988A',['mrc','guss','a2ds2','mrs','dn4','epworth']],
  ['fa','Fibrillation atriale','#2D82D8',['chadsvasc','hasbled','reprise','cockcroft']],
  ['etio','Étiologie et prévention','#4A5DE2',['ascod','causes-infarctus','causes-hematome','jeune','rope','prevention']],
  ['theorie','Théorie','#6C7DA6',['syndromes','imagerie']],
@@ -1060,6 +1291,7 @@ function carnetEntryText(e0,n){
   if(e.motif) L.push('   Motif : '+e.motif);
   if(e.atcd) L.push('   Antécédents : '+e.atcd);
   if(e.ttt||e.aco) L.push('   Traitement : '+[e.aco?'SOUS ANTICOAGULANT':'',e.ttt].filter(Boolean).join(' ; '));
+  { const r=nsCalc(e0); if(r&&!r.miss){ const d=nsDetail(e0); L.push('   NIHSS : '+r.tot+(e0.nsT?' à '+hhmm(e0.nsT):'')+(d?' ('+d+')':'')); } else if(e.nihss&&e.type!=='alerte') L.push('   NIHSS : '+e.nihss); }
   if(e.exam) L.push('   Examen : '+e.exam);
   if(e.concl) L.push('   Fait / avis donné : '+e.concl);
   const rest=(e.todos||[]).filter(x=>!x.done).map(x=>x.x), done=(e.todos||[]).filter(x=>x.done).map(x=>x.x);
@@ -1091,7 +1323,7 @@ function cSurvNext(e){ if(!e.tb) return null; const n=e.surv||0; return n>=SURV_
 function cAlerteLines(e){ const L=[], ts=ATIMES.filter(t=>e[t[0]]).map(t=>t[1].toLowerCase()+' '+hhmm(e[t[0]]));
   if(ts.length) L.push('   Horaires : '+ts.join(', '));
   const d=cDelays(e); if(d.length) L.push('   Délais : '+d.map(x=>x[0].toLowerCase()+' '+x[1]).join(', '));
-  if(e.nihss) L.push('   NIHSS : '+e.nihss); if(e.dec) L.push('   Décision : '+e.dec);
+  if(e.nihss&&!(nsCalc(e)&&!nsCalc(e).miss)) L.push('   NIHSS : '+e.nihss); if(e.dec) L.push('   Décision : '+e.dec);
   if(e.tb){ const nx=cSurvNext(e), n=e.surv||0; L.push('   Surveillance post-thrombolyse : '+n+' contrôle'+(n>1?'s':'')+' sur '+SURV_N+(nx?', prochain à '+hhmm(nx):', terminée')); }
   return L; }
 const TRAMES=[
@@ -1240,21 +1472,17 @@ function chronoHTML(){
 }
 function listHTML(){
   const f=q.trim().toLowerCase();
-  const out=GROUPS.map(([g,name,col])=>{ const ts=TOOLS.filter(t=>t.g===g&&(!f||(t.n+' '+t.d).toLowerCase().includes(f)));
-    return ts.length?`<section class="group" style="--gc:${col}"><h2><i class="dot"></i>${name}</h2><div class="list">${ts.map(t=>`<a href="#${t.id}"><strong>${esc(t.n)}</strong><span class="kind">${KIND[t.type]}</span><span class="d">${esc(t.d)}</span></a>`).join('')}</div></section>`:''; }).join('');
+  const out=GROUPS.filter(x=>x[0]!=='garde').map(([g,name,col])=>{ const ts=TOOLS.filter(t=>t.g===g&&(!f||(t.n+' '+t.d).toLowerCase().includes(f)));
+    return ts.length?`<section class="group" style="--gc:${col}"><h2><i class="dot"></i>${name}</h2><div class="list">${ts.map(t=>`<a href="#${t.id}"><strong>${esc(t.n)}</strong><span class="d">${esc(t.d)}</span></a>`).join('')}</div></section>`:''; }).join('');
   return out||'<p class="muted">Aucun outil ne correspond à cette recherche.</p>';
 }
 function home(){
-  app.innerHTML=`<header class="top"><h1>Garde neuro</h1><p class="muted">Scores et repères de l'alerte AVC et de l'USINV.</p></header>
-  ${tabs('home')}
-  <div id="chrono">${chronoHTML()}</div>
-  <a class="start" href="#alerte">Dérouler une alerte thrombolyse<span>6 étapes</span></a>
-  <nav class="quick" aria-label="Accès rapide"><a href="#nihss"><b>NIHSS</b><span>coter</span></a><a href="#entree"><b>Mot d'entrée</b><span>à cocher</span></a><a href="#dose"><b>Dose</b><span>selon le poids</span></a></nav>
-  <input class="search" id="q" type="search" placeholder="Chercher un score" aria-label="Chercher un score" value="${esc(q)}">
-  <div id="list" style="display:flex;flex-direction:column;gap:22px">${listHTML()}</div>
-  <footer>Aide-mémoire personnel. Les doses et les seuils viennent des recommandations citées dans chaque fiche : vérifie-les avec le protocole du service.</footer>`;
+  app.innerHTML=`<header class="top"><h1>Outils</h1></header>
+  <input class="search" id="q" type="search" placeholder="Chercher un score, une fiche" aria-label="Chercher un outil" value="${esc(q)}">
+  <div id="list" style="display:flex;flex-direction:column;gap:20px">${listHTML()}</div>
+  <footer>Aide-mémoire personnel. Les doses et les seuils viennent des recommandations citées dans chaque fiche : vérifie-les avec le protocole du service.</footer>${tabs('outils')}`;
 }
-function head(t,reset){ return `<div class="tool-head"><div class="line"><a class="back" href="${fromId==='arbre'?'#arbre':fromId==='carnet'?'#carnet':'#'}">${fromId==='arbre'?"Retour à l'arbre":fromId==='carnet'?'Retour au carnet':'Tous les outils'}</a>${reset?'<button class="ghost small" data-act="reset">Remettre à zéro</button>':''}</div><p class="gname" style="--gc:${(LAYOUT.find(l=>l[0]===t.g)||[])[2]}"><i class="dot"></i>${(LAYOUT.find(l=>l[0]===t.g)||[])[1]}</p><h1>${esc(t.n)}</h1><p class="muted">${esc(t.d)}</p><p class="small muted">Fiche relue le 13 novembre 2026</p></div>`; }
+function head(t,reset){ return `<div class="tool-head"><div class="line"><a class="back" href="${fromId==='arbre'?'#arbre':fromId==='carnet'?'#carnet':'#outils'}">${fromId==='arbre'?"Retour à l'arbre":fromId==='carnet'?'Retour au carnet':'Outils'}</a>${reset?'<button class="ghost small" data-act="reset">Remettre à zéro</button>':''}</div><p class="gname" style="--gc:${(LAYOUT.find(l=>l[0]===t.g)||[])[2]}"><i class="dot"></i>${(LAYOUT.find(l=>l[0]===t.g)||[])[1]}</p><h1>${esc(t.n)}</h1><p class="muted">${esc(t.d)}</p><p class="small muted">Fiche relue le 13 novembre 2026</p></div>`; }
 function bar(big,txt,lvl,can,isText){ return `<div class="bar ${lvl||''}"><div id="fallback"></div><div class="bar-in"><div class="big${isText?' text':''}">${big}</div><div class="verdict">${txt}</div><button class="copy" data-act="copy"${can?'':' disabled'}>Copier</button></div></div>`; }
 function scoreBar(t){
   const s=S[t.id], r=score(t,s);
@@ -1299,17 +1527,20 @@ function cSave(){ try{ localStorage.setItem('gn-carnet',JSON.stringify(CARNET));
 let cBackup=0, cRestoreMsg=''; try{ cBackup=+localStorage.getItem('gn-backup')||0; }catch(e){}
 try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{}); }catch(e){}
 const BK='GARDE-NEURO-SAUVEGARDE ';
-function backupText(){ return BK+btoa(unescape(encodeURIComponent(JSON.stringify({v:1,at:Date.now(),carnet:CARNET,annuaire:ANNU})))); }
+function backupText(){ return BK+btoa(unescape(encodeURIComponent(JSON.stringify({v:1,at:Date.now(),carnet:CARNET,annuaire:ANNU,hosp:HOSP,rooms:ROOMS})))); }
 function restoreFrom(txt){
   const i=txt.indexOf(BK); if(i<0) return [0,"Ce texte n'est pas une sauvegarde du carnet. Colle le texte complet, qui commence par GARDE-NEURO-SAUVEGARDE."];
   let d; try{ d=JSON.parse(decodeURIComponent(escape(atob(txt.slice(i+BK.length).trim().split(/\s/)[0])))); }catch(e){ return [0,'La sauvegarde est incomplète ou abîmée. Recopie-la en entier.']; }
   if(!d||!Array.isArray(d.carnet)) return [0,'La sauvegarde ne contient pas de carnet.'];
   let na=0; if(Array.isArray(d.annuaire)) d.annuaire.forEach(r=>{ if(!r||!r.n) return; const cur=ANNU.find(x=>x.l===r.l); if(cur&&!cur.n){ cur.n=r.n; na++; } else if(!cur){ ANNU.push({l:r.l,n:r.n}); na++; } }); if(na) aSave();
   let n=0; d.carnet.forEach(x=>{ if(x&&x.id&&!CARNET.some(y=>y.id===x.id)){ CARNET.push(x); n++; } });
-  cSave(); return [1,(n?n+' fiche'+(n>1?'s':'')+' restaurée'+(n>1?'s':'')+'.':'Toutes les fiches de cette sauvegarde étaient déjà dans le carnet.')+(na?' '+na+' numéro'+(na>1?'s':'')+' de l\'annuaire restauré'+(na>1?'s':'')+'.':'')];
+  if(Array.isArray(d.rooms)){ d.rooms.forEach(r=>{ if(r&&!ROOMS.includes(r)) ROOMS.push(r); }); roomSave(); }
+  let nh=0; if(Array.isArray(d.hosp)){ d.hosp.forEach(x=>{ if(x&&x.id&&!HOSP.some(y=>y.id===x.id)){ HOSP.push(x); nh++; } }); if(nh) hSave(); }
+  cSave(); return [1,(nh?nh+' patient'+(nh>1?'s':'')+' hospitalisé'+(nh>1?'s':'')+' restauré'+(nh>1?'s':'')+'. ':'')+(n?n+' fiche'+(n>1?'s':'')+' restaurée'+(n>1?'s':'')+'.':nh?'':'Toutes les fiches de cette sauvegarde étaient déjà dans le carnet.')+(na?' '+na+' numéro'+(na>1?'s':'')+' de l\'annuaire restauré'+(na>1?'s':'')+'.':'')];
 }
-function tabs(a){ const n=CARNET.filter(e=>!e.traite).length;
-  return `<nav class="tabs" aria-label="Sections"><a href="#"${a==='home'?' aria-current="page"':''}>Outils</a><a href="#arbre"${a==='arbre'?' aria-current="page"':''}>Arbre AVC</a><a href="#carnet"${a==='carnet'?' aria-current="page"':''}>Carnet${n?'<span class="badge">'+n+'</span>':''}</a></nav>`; }
+const ICO={carnet:'<path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h5M10 12h5"/>',outils:'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>',arbre:'<path d="M12 3v5M12 8H6v5M12 8h6v5M6 13v3M18 13v3M4 16h4v4H4zM16 16h4v4h-4z"/>'};
+function tabs(a){ const n=CARNET.filter(e=>!e.traite).length, it=(k,h,l,b)=>`<a href="${h}"${a===k?' aria-current="page"':''}><svg viewBox="0 0 24 24" aria-hidden="true">${ICO[k]}</svg><span>${l}</span>${b||''}</a>`;
+  return `<nav class="tabbar" aria-label="Sections">${it('carnet','#carnet','Carnet',n?'<i class="badge">'+n+'</i>':'')}${it('outils','#outils','Outils')}${it('arbre','#arbre','Arbres AVC')}</nav>`; }
 function clip(b,txt,box){
   const lab=b.textContent, done=()=>{ b.textContent='Copié'; setTimeout(()=>{ b.textContent=lab; },1500); };
   const fail=()=>{ const f=document.getElementById(box); if(!f) return; f.innerHTML='<textarea readonly aria-label="Texte à copier"></textarea>'; const ta=f.firstChild; ta.value=txt; ta.focus(); ta.select(); };
@@ -1318,13 +1549,41 @@ function clip(b,txt,box){
 
 function treeView(){ treeMode==='full'?treeFull():treeStep(); }
 function treeModes(){ return `<div class="seg" role="group" aria-label="Affichage"><button data-tm="full" aria-pressed="${treeMode==='full'}">Arbres complets</button><button data-tm="step" aria-pressed="${treeMode==='step'}">Pas à pas</button></div>`; }
+let GD=[], gZoom=0;
+const gTxt=h=>String(h).replace(/<[^>]+>/g,'');
+function gDet(t,l,a,h,cls){ GD.push({t,l:l||[],a:a||[],h,cls}); return GD.length-1; }
+function gNode(x){
+  if(x.g) return `<button class="g-n g-g" data-ft="${x.g}">${x.t}<small>ouvrir</small></button>`;
+  if(x.q){ const d=x.h?gDet(x.q,[],[],x.h,'q'):-1; return `<${d<0?'div':'button'} class="g-n g-q"${d<0?'':' data-gd="'+d+'"'}>${x.q}${d<0?'':'<small>précision</small>'}</${d<0?'div':'button'}>`; }
+  const t=x.s!==undefined?x.s:x.t, cls=x.e?'g-e '+x.e:'g-s', has=(x.l&&x.l.length)||(x.a&&x.a.length), d=has?gDet(t,x.l,x.a,'',x.e||'s'):-1;
+  return `<${d<0?'div':'button'} class="g-n ${cls}"${d<0?'':' data-gd="'+d+'"'}>${t}${d<0?'':'<small>détails</small>'}</${d<0?'div':'button'}>`;
+}
+function gChain(arr){ arr=Array.isArray(arr)?arr:[arr]; if(!arr.length) return ''; const x=arr[0], rest=arr.slice(1);
+  let h=gNode(x);
+  if(x.q) h+=`<ul>${x.b.map(br=>`<li><span class="g-lab">${br[0]}</span><i class="g-stub"></i>${gChain(br[1])}</li>`).join('')}</ul>`;
+  else if(rest.length) h+=`<ul class="one"><li>${gChain(rest)}</li></ul>`;
+  return h; }
+function gSections(arr){ const out=[]; let cur=[]; arr.forEach(x=>{ cur.push(x); if(x.q){ out.push(cur); cur=[]; } }); if(cur.length) out.push(cur); return out; }
+function gFit(first){ const w=document.getElementById('gwrap'), c=document.getElementById('gin'); if(!w||!c) return;
+  c.style.zoom=1; const fit=Math.min(1,(w.clientWidth-8)/c.scrollWidth);
+  if(first) gZoom=Math.max(.7,fit); else if(!gZoom) gZoom=Math.max(.35,fit); c.style.zoom=gZoom;
+  const z=document.getElementById('gzv'); if(z) z.textContent=Math.round(gZoom*100)+' %';
+  if(first) w.scrollLeft=(c.scrollWidth*gZoom-w.clientWidth)/2; }
+function gSheet(i){ const d=GD[i], sh=document.getElementById('gsheet'); if(!d||!sh) return;
+  sh.innerHTML=`<div class="gs-in ${d.cls}"><div class="gs-h"><b>${d.t}</b><button class="ghost small" data-gx="1">Fermer</button></div>${d.h?`<p>${d.h}</p>`:''}${d.l.length?tUl(d.l):''}${ftLinks(d.a)}</div>`;
+  sh.hidden=false; }
 function treeFull(){
-  const t=FT[ftKey];
-  app.innerHTML=tabs('arbre')+`<div class="tool-head"><h1>Arbre AVC</h1><p class="muted">Chaque arbre se lit de haut en bas, de la question à la conduite à tenir.</p></div>${treeModes()}
+  const t=FT[ftKey]; GD=[];
+  const secs=gSections(t.b).map((sec,i)=>`<div class="g-sec">${i?'<span class="g-then">puis</span>':''}<ul class="g-root"><li>${gChain(sec)}</li></ul></div>`).join('');
+  app.innerHTML=tabs('arbre')+`<div class="tool-head"><h1>Arbres AVC</h1></div>${treeModes()}
   <div class="chips ftchips">${FT_ORDER.map(k=>`<button class="chip" data-ft="${k}" aria-pressed="${ftKey===k}">${FT[k].n}</button>`).join('')}</div>
-  <section class="fl" id="ftop"><div class="fl-head"><h2>${t.n}</h2><span class="small muted">${t.d} · ${ftCount(t.b)} issues</span></div>${ftBlocks(t.b)}</section>
-  <div class="legend small"><span><i class="lg ok"></i>Traitement indiqué ou situation rassurante</span><span><i class="lg warn"></i>À discuter, ou pas de traitement</span><span><i class="lg crit"></i>Urgence, geste immédiat</span></div>
-  <p class="note">Arbres rédigés le 18 novembre 2026 d'après la HAS (octobre 2025), l'ESO et la SFNV. Les branches céphalée et vertige sont rédigées de mémoire. Aide à la décision : elle ne remplace ni le neurologue senior ni le protocole du service.</p>`;
+  <div class="g-bar"><div><b>${t.n}</b></div><div class="g-zoom"><button class="ghost small" data-gz="-1" aria-label="Dézoomer">−</button><span id="gzv"></span><button class="ghost small" data-gz="1" aria-label="Zoomer">+</button><button class="ghost small" data-gz="0">Tout voir</button></div></div>
+  <div class="gwrap" id="gwrap"><div class="gin" id="gin">${secs}</div></div>
+  <p class="small muted">Touche une case pour lire le détail. Fais glisser pour te déplacer dans l'arbre.</p>
+  <div class="legend small"><span><i class="lg q"></i>Question</span><span><i class="lg ok"></i>Traitement indiqué</span><span><i class="lg warn"></i>À discuter ou pas de traitement</span><span><i class="lg crit"></i>Urgence</span></div>
+  <p class="note">Arbres rédigés le 18 novembre 2026 d'après la HAS (octobre 2025), l'ESO et la SFNV. Les branches céphalée et vertige sont rédigées de mémoire. Aide à la décision : elle ne remplace ni le neurologue senior ni le protocole du service.</p>
+  <div class="gsheet" id="gsheet" hidden></div>`;
+  gZoom=0; requestAnimationFrame(()=>gFit(true));
 }
 function treeStep(){
   const cur=treeCur(TP), n=TREE[cur], s=treeState(TP);
@@ -1381,7 +1640,7 @@ function cCard(e){
   return `<div class="ecard${e.traite?' done':''}" style="--gc:${ty[2]}">
    <button class="eopen" data-ca="open" data-id="${e.id}"><span class="eh"><b>${hhmm(e.t)}</b><span class="etype"><i class="dot"></i>${esc(cLabel(e))}</span>${e.urgent?'<span class="eurg">Urgent</span>':''}</span>
    <strong>${who}</strong>${e.lieu?`<span class="d">${esc(e.lieu)}</span>`:''}${e.motif?`<span class="d">${esc(e.motif.length>90?e.motif.slice(0,90)+'…':e.motif)}</span>`:''}
-   ${rest||nx||(e.rv&&!e.traite)||e.transmettre?`<span class="sts">${rest?`<span class="st warn">${rest} à faire</span>`:''}${e.rv&&!e.traite?`<span class="st${late?' crit':' warn'}">${late?'À revoir depuis ':'À revoir à '}${hhmm(e.rv)}</span>`:''}${nx?`<span class="st ${Date.now()>nx?'crit':'warn'}">Contrôle à ${hhmm(nx)}</span>`:''}${e.transmettre?'<span class="st on">À transmettre</span>':''}</span>`:''}</button>
+   ${e.nihss||rest||nx||(e.rv&&!e.traite)||e.transmettre?`<span class="sts">${e.nihss?`<span class="st">NIHSS ${esc(e.nihss)}</span>`:''}${rest?`<span class="st warn">${rest} à faire</span>`:''}${e.rv&&!e.traite?`<span class="st${late?' crit':' warn'}">${late?'À revoir depuis ':'À revoir à '}${hhmm(e.rv)}</span>`:''}${nx?`<span class="st ${Date.now()>nx?'crit':'warn'}">Contrôle à ${hhmm(nx)}</span>`:''}${e.transmettre?'<span class="st on">À transmettre</span>':''}</span>`:''}</button>
    <div class="qrow">${tg('vu','Vu')}${tg('avis','Avis noté')}${tg('traite','Traité')}</div></div>`;
 }
 function carnetList(){
@@ -1389,9 +1648,10 @@ function carnetList(){
   const list=carnetSort(CARNET).filter(e=>cFilter==='all'||(cFilter==='todo'?!e.traite:e.traite));
   const old=CARNET.some(e=>Date.now()-e.t>36*36e5);
   const f=(k,l)=>`<button class="chip" data-ca="filter" data-v="${k}" aria-pressed="${cFilter===k}">${l}</button>`;
-  app.innerHTML=tabs('carnet')+`<div class="tool-head"><h1>Carnet de garde</h1><p class="muted">Un appel, une fiche. Rien ne se perd jusqu'aux transmissions.</p></div>
+  app.innerHTML=tabs('carnet')+`<div class="tool-head"><h1>Carnet de garde</h1><p class="muted">${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}</p></div>
   <button class="start asbtn" data-ca="new">Nouvel appel<span>ouvrir une fiche</span></button>
-  <div class="minirow"><a class="ghost aslink" href="#annuaire">Annuaire</a>${CARNET.length?`<button class="ghost bkbtn${(!cBackup||Date.now()-cBackup>36e5)?' old':''}" data-ca="backup">Sauvegarder<small>${cBackup?'dernière à '+hhmm(cBackup):'jamais faite'}</small></button>`:''}</div>
+  ${hListHTML()}
+  <div class="minirow"><a class="ghost aslink" href="#annuaire">Annuaire</a>${CARNET.length||HOSP.length?`<button class="ghost bkbtn${(!cBackup||Date.now()-cBackup>36e5)?' old':''}" data-ca="backup">Sauvegarder<small>${cBackup?'dernière à '+hhmm(cBackup):'jamais faite'}</small></button>`:''}</div>
   <div id="cbk"></div>
   ${cStoreOK?'':'<p class="warnbox">Ce navigateur refuse l\'enregistrement : le carnet s\'efface si tu fermes la page. Copie tes transmissions avant de quitter.</p>'}
   ${CARNET.length?`<div class="chips">${f('todo','À faire ('+todo+')')}${f('done','Terminés ('+done+')')}${f('all','Tous ('+CARNET.length+')')}</div>`:''}
@@ -1405,6 +1665,22 @@ function carnetList(){
 function cTodos(e){
   return (e.todos||[]).map((x,i)=>`<div class="todo"><button class="chk" data-ca="todotog" data-i="${i}" aria-pressed="${!!x.done}" aria-label="${x.done?'Fait':'À faire'} : ${esc(x.x)}"></button><span class="${x.done?'tdone':''}">${esc(x.x)}</span><button class="ghost small" data-ca="tododel" data-i="${i}" aria-label="Retirer ${esc(x.x)}">Retirer</button></div>`).join('');
 }
+const NSL=['1a Vigilance','1b Orientation','1c Commandes','2 Oculomotricité','3 Champ visuel','4 Paralysie faciale','5a Membre sup. gauche','5b Membre sup. droit','6a Membre inf. gauche','6b Membre inf. droit','7 Ataxie','8 Sensibilité','9 Langage','10 Dysarthrie','11 Extinction, négligence'];
+const NSS=['vigilance','orientation','commandes','oculomotricité','champ visuel','face','MSG','MSD','MIG','MID','ataxie','sensibilité','langage','dysarthrie','négligence'];
+let nsOpen=false;
+const nihT=()=>TOOLS.find(x=>x.id==='nihss');
+function nsCalc(e){ const t=nihT(), s=e.ns; if(!s) return null; let tot=0,miss=0; t.items.forEach((it,i)=>{ if(s[i]==null||s[i]<0) miss++; else tot+=it.o[s[i]][1]; }); return {tot,miss}; }
+function nsDetail(e){ const t=nihT(); return (e.ns||[]).map((k,i)=>k>=0&&k!=null&&(t.items[i].o[k][1]>0||t.items[i].o[k][2])?NSS[i]+' '+(t.items[i].o[k][2]||t.items[i].o[k][1]):null).filter(Boolean).join(', '); }
+function nsSum(e){ const r=nsCalc(e); if(!r) return '<span class="muted">À coter</span>'; if(r.miss) return '<span class="muted">'+(15-r.miss)+' items sur 15</span>';
+  const it=nihT().interp(r.tot); return `<b class="nstot ${it[1]}">${r.tot}</b><span class="muted">${esc(it[0])}${e.nsT?', coté à '+hhmm(e.nsT):''}</span>`; }
+function nsItem(e,i){ const it=nihT().items[i], k=e.ns?e.ns[i]:-1, sel=k>=0&&k!=null;
+  return `<div class="nsit" data-ni="${i}"><div class="nsh"><span class="nsl">${NSL[i]}</span><span class="nsopts">${it.o.map((o,j)=>`<button class="nso" data-ca="ns" data-i="${i}" data-k="${j}" aria-pressed="${k===j}" aria-label="${esc(NSL[i])} : ${o[2]||o[1]}, ${esc(o[0])}">${o[2]||o[1]}</button>`).join('')}</span></div>
+   <p class="nsd">${sel?esc(it.o[k][0]):it.o.map(o=>'<span><b>'+(o[2]||o[1])+'</b> '+esc(o[0])+'</span>').join('')}</p></div>`; }
+function nsBlock(e){
+  return `<details class="nsbox"${nsOpen?' open':''}><summary><span class="nsti">NIHSS</span><span class="nssum" id="nssum">${nsSum(e)}</span></summary>
+   <div class="chips"><button class="chip sm" data-ca="ns0">Tout à 0</button>${e.ns?'<button class="chip sm" data-ca="nsclr">Effacer</button>':''}</div>
+   <div class="nsl-wrap">${nihT().items.map((x,i)=>nsItem(e,i)).join('')}</div></details>`; }
+function nsSync(e){ const r=nsCalc(e); if(r&&!r.miss){ e.nihss=String(r.tot); e.nsT=Date.now(); } }
 function carnetEntry(e){
   const tf=(k,l,ph,area)=>`<div class="cf"><label for="c-${k}">${l}</label>${area?`<textarea id="c-${k}" data-ck="${k}" rows="3" placeholder="${ph||''}">${esc(e[k]||'')}</textarea>`:`<input id="c-${k}" data-ck="${k}" type="text" autocomplete="off" placeholder="${ph||''}" value="${esc(e[k]||'')}">`}</div>`;
   const tg=(k,l)=>`<button class="chip" data-ca="tog" data-k="${k}" aria-pressed="${!!e[k]}">${l}</button>`;
@@ -1419,6 +1695,7 @@ function carnetEntry(e){
   <section class="fsec">
    <div class="two nomage"><div class="cf"><label for="c-nom">Patient</label><input id="c-nom" data-ck="nom" type="text" autocomplete="off" placeholder="Initiales ou nom" value="${esc(e.nom||'')}"></div><div class="cf"><label for="c-age">Âge</label><input id="c-age" data-ck="age" type="text" inputmode="numeric" autocomplete="off" placeholder="ans" value="${esc(e.age||'')}"></div></div>
    <div class="cf"><label for="c-notes">Notes prises au téléphone</label><textarea id="c-notes" class="bignotes" data-ck="notes" placeholder="Tout noter en vrac, trier après. Le micro du clavier permet de dicter.">${esc(e.notes||'')}</textarea></div>
+   ${nsBlock(e)}
   </section>
   ${e.type==='alerte'?alerteBlock(e):''}
   <section class="fsec"><h2>Le patient</h2>
@@ -1450,11 +1727,166 @@ function carnetEntry(e){
    ${cConfirm==='del'?`<div class="card"><p><b>Supprimer cette fiche ?</b> C'est définitif.</p><div class="chips"><button class="chip danger" data-ca="del2">Oui, supprimer</button><button class="chip" data-ca="cancel">Annuler</button></div></div>`:'<button class="ghost wide" data-ca="del">Supprimer la fiche</button>'}
   </section>`;
 }
-function carnetView(){ const e=cGet(); if(e) carnetEntry(e); else { cOpen=null; carnetList(); } }
+/* ---------- Patients hospitalisés ---------- */
+let HOSP=[], hOpen=null, hConfirm='', hAddRoom=false;
+const ROOMS0=['524','525','526','527','528','529','530','531']; let ROOMS=[];
+try{ const r=localStorage.getItem('gn-rooms'); if(r){ const a=JSON.parse(r); if(Array.isArray(a)) ROOMS=a; } }catch(e){}
+const allRooms=()=>[...ROOMS0,...ROOMS.filter(x=>!ROOMS0.includes(x))];
+function roomSave(){ try{ localStorage.setItem('gn-rooms',JSON.stringify(ROOMS)); }catch(e){} }
+try{ const r=localStorage.getItem('gn-hosp'); if(r){ const a=JSON.parse(r); if(Array.isArray(a)) HOSP=a; } }catch(e){}
+function hSave(){ try{ localStorage.setItem('gn-hosp',JSON.stringify(HOSP)); cStoreOK=true; }catch(e){ cStoreOK=false; } }
+const hGet=()=>HOSP.find(e=>e.id===hOpen);
+const H_EX=['IRM cérébrale','Angioscanner des TSA et intracrânien','Scanner cérébral de contrôle','Écho-doppler des TSA','ECG','Bilan biologique AVC','ETT','ETO','Holter ECG'];
+const H_EXQ=['IRM de contrôle','Angio-IRM','Doppler transcrânien','Holter implantable','EEG','Ponction lombaire','Polygraphie du sommeil','Bilan du sujet jeune','Bilan de thrombophilie','Scanner thoraco-abdomino-pelvien','Fond d\'œil'];
+const H_RE=['Kinésithérapie','Orthophonie','Ergothérapie','Assistante sociale'];
+const H_REQ=['Diététicienne','Neuropsychologue','Psychologue','Orthoptiste','Infirmière d\'éducation'];
+const H_AV=['Cardiologie','Psychiatrie','Gériatrie','Neurochirurgie','Chirurgie vasculaire','Médecine physique et réadaptation','Diabétologie','Néphrologie','ORL','Ophtalmologie','Rythmologie'];
+const H_TQ=[['Kardégic','75 mg',[1,0,0,0]],['Clopidogrel','75 mg',[1,0,0,0]],['Atorvastatine','80 mg',[0,0,1,0]],['Apixaban','5 mg',[1,0,1,0]],['Rivaroxaban','20 mg',[0,0,1,0]],['Enoxaparine','4000 UI SC',[0,0,1,0]],['Paracétamol','1 g',[1,1,1,0]]];
+const H_SO=['RAD','RAD avec aides','HAD','SMR (ex-SSR)','Neurologie ou UNV','Autre service','EHPAD','Décès'];
+const H_ST=['Pas prévu','À demander','Demandé','Fait'], PR=['matin','midi','soir','coucher'];
+const hdm=ms=>{ const d=new Date(ms); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'); };
+function hMig(e){ ['ex','av','re'].forEach(k=>(e[k]||[]).forEach(x=>{ if(x.v!==2){ if(x.s>=1) x.s+=1; x.v=2; } })); }
+HOSP.forEach(hMig);
+const H_CT=[['ta','TA','mmHg'],['fc','FC','/min'],['fr','FR','/min'],['sat','SpO2','%'],['temp','T°','°C'],['gly','Glycémie','g/L']];
+function hCtLine(e){ const c=e.ct||{}, a=H_CT.filter(x=>c[x[0]]).map(x=>(x[0]==='sat'?'SpO2 ':x[0]==='temp'?'T° ':x[0]==='gly'?'glycémie ':x[1]+' ')+c[x[0]]+(x[2].startsWith('/')?x[2]:' '+x[2]));
+  return 'Constantes : '+(a.length?a.join(', '):'TA    mmHg, FC    /min, FR    /min, SpO2    %, T°    °C, glycémie    g/L'); }
+function hNew(){ const e={id:'h'+Date.now().toString(36)+Math.floor(Math.random()*1e4),t:Date.now(),entree:(d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'))(new Date()),ex:H_EX.map(n=>({n,s:0,r:'',v:2})),re:H_RE.map(n=>({n,s:0,r:'',v:2})),av:[],tt:[],todos:[]}; HOSP.unshift(e); hSave(); hOpen=e.id; hConfirm=''; nsOpen=false; }
+function hJ(e){ if(!e.entree) return ''; const d=Math.floor((new Date().setHours(0,0,0,0)-new Date(e.entree+'T00:00').getTime())/864e5); return d>=0?'J'+d:''; }
+const hDate=iso=>iso?iso.split('-').reverse().join('/'):'';
+function hWho(e){ return [e.nom||'Patient sans nom',e.age?e.age+' ans':''].filter(Boolean).join(', '); }
+function hCard(e){ const wait=[...(e.ex||[]),...(e.av||[])].filter(x=>x.s===1||x.s===2).length, j=hJ(e);
+  return `<button class="hcard${e.sorti?' done':''}" data-ha="open" data-id="${e.id}"><span class="eh"><span class="hrm">${e.lit?esc(e.lit):'–'}</span><strong>${esc(hWho(e))}</strong>${j?`<span class="st">${j}</span>`:''}</span>
+   ${e.diag?`<span class="d">${esc(e.diag)}</span>`:''}
+   ${wait||e.sortie||e.nihss?`<span class="sts">${e.nihss?`<span class="st">NIHSS ${esc(e.nihss)}</span>`:''}${wait?`<span class="st warn">${wait} en attente</span>`:''}${e.sortie?`<span class="st on">${esc(e.sortie)}</span>`:''}</span>`:''}</button>`; }
+function hListHTML(){ const rk=e=>{ const i=allRooms().indexOf(e.lit); return i<0?999:i; }, act=HOSP.filter(e=>!e.sorti).sort((a,b)=>rk(a)-rk(b)), out=HOSP.filter(e=>e.sorti);
+  return `<button class="start alt asbtn" data-ha="new">Patient hospitalisé<span>nouvelle fiche</span></button>
+  ${HOSP.length?`<details class="hlist" open><summary>Mes patients hospitalisés (${act.length})</summary><div class="elist">${act.map(hCard).join('')||'<p class="small muted">Aucun patient en cours.</p>'}</div>
+  ${out.length?`<details class="hout"><summary>Sortis (${out.length})</summary><div class="elist">${out.map(hCard).join('')}</div></details>`:''}</details>`:''}`; }
+function hWhen(x){ return x.s===2&&x.td?'demandé le '+hdm(x.td)+' à '+hhmm(x.td):x.s===3?(x.tf?'fait le '+hdm(x.tf):'fait')+(x.td?' (demandé le '+hdm(x.td)+')':''):''; }
+function hStRow(k,x,i,del){ const w=hWhen(x);
+  return `<div class="hrow s${x.s}"><button class="hst" data-ha="st" data-l="${k}" data-i="${i}" aria-label="${esc(x.n)} : ${H_ST[x.s]}, toucher pour passer à l'étape suivante"><i></i><span>${H_ST[x.s]}</span></button><span class="hn">${esc(x.n)}${w?`<small>${w}</small>`:''}</span>${del?`<button class="ghost small hdel" data-ha="ldel" data-l="${k}" data-i="${i}" aria-label="Retirer ${esc(x.n)}">×</button>`:''}
+   ${x.s>=2?`<input class="hres" data-hl="${k}" data-i="${i}" data-f="r" type="text" autocomplete="off" placeholder="${x.s===3?'Résultat':'Rendez-vous, précision'}" value="${esc(x.r||'')}">`:''}${x.s?`<button class="hback" data-ha="stback" data-l="${k}" data-i="${i}">Revenir en arrière</button>`:''}</div>`; }
+function hListBlock(k,quick,ph){ const e=hGet(), L=e[k]||[], base=k==='ex'?H_EX:k==='re'?H_RE:[];
+  const q=quick.filter(n=>!L.some(x=>x.n===n));
+  return `<div class="hrows">${L.map((x,i)=>hStRow(k,x,i,!base.includes(x.n))).join('')||'<p class="small muted">Rien pour l\'instant.</p>'}</div>
+   ${q.length?`<div class="chips">${q.map(n=>`<button class="chip sm" data-ha="ladd" data-l="${k}" data-v="${esc(n)}">+ ${esc(n)}</button>`).join('')}</div>`:''}
+   <div class="addrow"><input id="hnew-${k}" type="text" autocomplete="off" placeholder="${ph}" aria-label="${ph}"><button class="ghost" data-ha="ladd" data-l="${k}">Ajouter</button></div>`; }
+function hTtRow(x,i){ return `<div class="ttrow"><div class="ttl"><input data-hl="tt" data-i="${i}" data-f="n" type="text" autocomplete="off" placeholder="Médicament" aria-label="Médicament" value="${esc(x.n||'')}"><input data-hl="tt" data-i="${i}" data-f="d" type="text" autocomplete="off" placeholder="Dose" aria-label="Dose" value="${esc(x.d||'')}"><button class="ghost small hdel" data-ha="ldel" data-l="tt" data-i="${i}" aria-label="Retirer ${esc(x.n||'la ligne')}">×</button></div>
+   <div class="ttp">${PR.map((p,j)=>`<button class="tp" data-ha="tp" data-i="${i}" data-j="${j}" aria-pressed="${!!(x.p&&x.p[j])}">${p}</button>`).join('')}<input data-hl="tt" data-i="${i}" data-f="c" type="text" autocomplete="off" placeholder="Autre : si besoin, 1 j sur 2…" aria-label="Précision de la prise" value="${esc(x.c||'')}"></div></div>`; }
+function hTf(e,k,l,ph,rows){ return `<div class="cf"><label for="h-${k}">${l}</label>${rows?`<textarea id="h-${k}" data-hk="${k}" rows="${rows}" placeholder="${ph||''}">${esc(e[k]||'')}</textarea>`:`<input id="h-${k}" data-hk="${k}" type="text" autocomplete="off" placeholder="${ph||''}" value="${esc(e[k]||'')}">`}</div>`; }
+function hChips(e,k,opts){ return `<div class="chips">${opts.map(o=>`<button class="chip sm" data-ha="pick" data-k="${k}" data-v="${esc(o)}" aria-pressed="${e[k]===o}">${esc(o)}</button>`).join('')}</div>`; }
+function hEntry(e){
+  const quick=['Récupérer les résultats','Prévenir la famille','Prévoir la sortie','Écrire le CRH'].filter(q=>!(e.todos||[]).some(x=>x.x===q));
+  const ns=nsBlock(e).replace(/data-ca=/g,'data-ha=');
+  const rooms=allRooms(); if(e.lit&&!rooms.includes(e.lit)) rooms.push(e.lit);
+  app.innerHTML=`<div class="tool-head"><div class="line"><button class="back asbtn" data-ha="back">Carnet</button><label class="hroom"><span>Chambre</span><select data-hk="lit" aria-label="Chambre"><option value=""${e.lit?'':' selected'}>–</option>${rooms.map(r=>`<option value="${esc(r)}"${e.lit===r?' selected':''}>${esc(r)}</option>`).join('')}<option value="__add">+ Ajouter</option></select></label></div>
+  ${hAddRoom?`<div class="addrow"><input id="hroom-new" type="text" inputmode="numeric" autocomplete="off" placeholder="Numéro de la nouvelle chambre" aria-label="Nouvelle chambre"><button class="ghost" data-ha="roomadd">Ajouter</button></div>`:''}
+  <h1>${esc(e.nom||'Nouveau patient')}</h1><span class="small muted"><span id="hsaved">${cStoreOK?'Enregistré sur cet appareil':'Non enregistré'}</span>${hJ(e)?' · '+hJ(e)+' d\'hospitalisation':''}</span></div>
+  <section class="fsec"><h2>Identité</h2>
+   <div class="two nomage"><div class="cf"><label for="h-nom">Nom, prénom</label><input id="h-nom" data-hk="nom" type="text" autocomplete="off" placeholder="Initiales ou nom" value="${esc(e.nom||'')}"></div><div class="cf"><label for="h-age">Âge</label><input id="h-age" data-hk="age" type="text" inputmode="numeric" autocomplete="off" placeholder="ans" value="${esc(e.age||'')}"></div></div>
+   <div class="cf"><label for="h-entree">Entré le</label><input id="h-entree" data-hk="entree" type="date" value="${esc(e.entree||'')}"></div>
+   ${hTf(e,'diag','Diagnostic, motif d\'hospitalisation','Infarctus sylvien gauche sur occlusion M1 thrombectomisée…')}
+  </section>
+  <section class="fsec"><h2>Mode de vie</h2>
+   ${hChips(e,'lat',['Droitier','Gaucher','Ambidextre'])}
+   ${hChips(e,'lieu',['Domicile seul','Domicile en couple ou en famille','EHPAD','Foyer, résidence'])}
+   ${hChips(e,'auto',['Autonome','Aide partielle','Dépendant'])}
+   ${hTf(e,'mdv','Précisions','Aides à domicile, étage, conduite, profession, tabac, alcool, médecin traitant, personne à prévenir et téléphone…',3)}
+  </section>
+  <section class="fsec"><h2>Antécédents</h2>${hTf(e,'atcd','Antécédents','',3)}${hTf(e,'allerg','Allergies','Aucune connue')}${hTf(e,'tthab','Traitement habituel à l\'entrée','',3)}</section>
+  <section class="fsec"><h2>Histoire de la maladie</h2>${hTf(e,'hdm','Histoire','Heure de début, mode d\'installation, prise en charge aux urgences, thrombolyse ou thrombectomie…',4)}</section>
+  <section class="fsec"><h2>Examen clinique à l'entrée</h2>${hTf(e,'exam','Examen','Constantes, examen neurologique, cardio-pulmonaire, déglutition…',4)}${hTf(e,'ecg',"ECG d'entrée",'Rythme sinusal, FC, PR, QRS, QTc, troubles de repolarisation…')}${ns}</section>
+  <section class="fsec"><h2>Évolution dans le service</h2>
+   <span class="lab">Constantes du jour</span>
+   <div class="ctgrid">${H_CT.map(x=>`<label class="ctf"><span>${x[1]}</span><input data-hl="ct" data-f="${x[0]}" type="text" inputmode="${x[0]==='ta'?'text':'decimal'}" autocomplete="off" placeholder="${x[2]}" value="${esc((e.ct||{})[x[0]]||'')}"></label>`).join('')}</div>
+   <div class="chips">${e.evol?'':'<button class="chip sm" data-ha="trame">Insérer la trame par plans</button>'}<button class="chip sm" data-ha="jour">+ Point du jour</button>${e.evol?'<button class="chip sm" data-ha="ctins">+ Constantes</button>':''}</div>
+   <textarea id="h-evol" class="bignotes hevol" data-hk="evol" placeholder="Sur le plan neurologique, extra-neurologique, des facteurs de risque, étiologique, thérapeutique…">${esc(e.evol||'')}</textarea>
+  </section>
+  <section class="fsec"><h2>Examens</h2><p class="small muted">Touche le rond à chaque étape : à demander, puis demandé, puis fait. L'heure est notée toute seule.</p>${hListBlock('ex',H_EXQ,'Autre examen')}</section>
+  <section class="fsec"><h2>Avis spécialisés</h2>${hListBlock('av',H_AV,'Autre spécialité')}</section>
+  <section class="fsec"><h2>Rééducation et accompagnement</h2>${hListBlock('re',H_REQ,'Autre intervenant')}</section>
+  <section class="fsec"><h2>Traitements en cours</h2>
+   <div class="ttlist">${(e.tt||[]).map(hTtRow).join('')||'<p class="small muted">Aucun traitement noté.</p>'}</div>
+   <div class="chips">${H_TQ.filter(q=>!(e.tt||[]).some(x=>x.n===q[0])).map(q=>`<button class="chip sm" data-ha="tadd" data-v="${esc(q[0])}">+ ${esc(q[0])}</button>`).join('')}<button class="chip sm" data-ha="tadd">+ Autre</button></div>
+   <p class="small muted">Les doses proposées sont les plus courantes : vérifie-les pour chaque patient.</p>
+  </section>
+  <section class="fsec"><h2>Sortie</h2>
+   <span class="lab">Mode de sortie</span>${hChips(e,'sortie',H_SO)}
+   <div class="two hid2"><div class="cf"><label for="h-sdate">Date prévue</label><input id="h-sdate" data-hk="sdate" type="date" value="${esc(e.sdate||'')}"></div><div class="cf"><label for="h-smrs">Rankin à la sortie</label><input id="h-smrs" data-hk="smrs" type="text" inputmode="numeric" autocomplete="off" placeholder="0 à 6" value="${esc(e.smrs||'')}"></div></div>
+   ${hTf(e,'snihss','NIHSS à la sortie','')}
+   ${hTf(e,'concl','Conclusion, diagnostic final','Topo de toute la prise en charge : diagnostic, traitement de phase aiguë, étiologie retenue, traitement de sortie…',4)}
+   ${hTf(e,'suivi','Suivi après la sortie','Consultation neurovasculaire, imagerie de contrôle, bilan à compléter, arrêt de travail, conduite…',3)}
+  </section>
+  <section class="fsec"><h2>À faire</h2>
+   <div id="htodos">${(e.todos||[]).map((x,i)=>`<div class="todo"><button class="chk" data-ha="todotog" data-i="${i}" aria-pressed="${!!x.done}" aria-label="${x.done?'Fait':'À faire'} : ${esc(x.x)}"></button><span class="${x.done?'tdone':''}">${esc(x.x)}</span><button class="ghost small" data-ha="tododel" data-i="${i}" aria-label="Retirer ${esc(x.x)}">Retirer</button></div>`).join('')}</div>
+   <div class="addrow"><input id="htodo-new" type="text" autocomplete="off" placeholder="Ajouter une tâche" aria-label="Nouvelle tâche"><button class="ghost" data-ha="todoadd">Ajouter</button></div>
+   ${quick.length?`<div class="chips">${quick.map(q=>`<button class="chip sm" data-ha="todoquick" data-v="${esc(q)}">+ ${esc(q)}</button>`).join('')}</div>`:''}
+  </section>
+  <section class="fsec"><div id="hfb"></div>
+   <button class="copy wide" data-ha="copy">Copier la fiche (pour le CRH)</button>
+   <button class="ghost wide" data-ha="sorti">${e.sorti?'Remettre dans les patients en cours':'Patient sorti : ranger la fiche'}</button>
+   ${hConfirm==='del'?`<div class="card"><p><b>Supprimer cette fiche ?</b> C'est définitif.</p><div class="chips"><button class="chip danger" data-ha="del2">Oui, supprimer</button><button class="chip" data-ha="cancel">Annuler</button></div></div>`:'<button class="ghost wide" data-ha="del">Supprimer la fiche</button>'}
+  </section>`;
+}
+function hText(e){
+  const ind=t=>String(t||'').trim(), L=[], sec=(t,v)=>{ v=ind(v); if(v) L.push(t.toUpperCase(),v,''); };
+  L.push((e.lit?'Chambre '+e.lit+' – ':'')+hWho(e)+(e.entree?' – entré le '+hDate(e.entree):''),'');
+  sec("Motif d'hospitalisation",e.diag);
+  sec('Mode de vie',[e.lat,e.lieu,e.auto].filter(Boolean).map((x,i)=>i?x.toLowerCase():x).join(', ')+(e.mdv?((e.lat||e.lieu||e.auto)?'. ':'')+ind(e.mdv):''));
+  sec('Antécédents',e.atcd); if(e.allerg) L.splice(L.length-1,0,'Allergies : '+ind(e.allerg));
+  sec("Traitement à l'entrée",e.tthab); sec('Histoire de la maladie',e.hdm);
+  const r=nsCalc(e); sec("Examen clinique à l'entrée",[ind(e.exam),e.ecg?"ECG d'entrée : "+ind(e.ecg):'',r&&!r.miss?'NIHSS à '+r.tot+(nsDetail(e)?' ('+nsDetail(e)+')':''):''].filter(Boolean).join('\n'));
+  sec('Évolution dans le service',String(e.evol||'').split('\n').filter(l=>!/^Sur le plan[^:]*:\s*$/.test(l)).join('\n').replace(/\n{3,}/g,'\n\n'));
+  const st=(k,t)=>{ const a=(e[k]||[]).filter(x=>x.s>0); if(a.length) sec(t,a.map(x=>'- '+x.n+' : '+(x.s===1?'à demander':hWhen(x)||H_ST[x.s].toLowerCase())+(x.r?', '+ind(x.r):'')).join('\n')); };
+  st('ex','Examens complémentaires'); st('av','Avis spécialisés'); st('re','Rééducation et accompagnement');
+  const tt=(e.tt||[]).filter(x=>x.n); if(tt.length) sec('Traitement en cours',tt.map(x=>{ const p=PR.filter((_,j)=>x.p&&x.p[j]); return '- '+x.n+(x.d?' '+x.d:'')+(p.length?' : '+p.length+' fois par jour ('+p.join(', ')+')':'')+(x.c?' '+x.c:''); }).join('\n'));
+  sec('Sortie',[e.sortie?'Mode de sortie : '+e.sortie:'',e.sdate?'Date : '+hDate(e.sdate):'',e.smrs?'Rankin à la sortie : '+e.smrs:'',e.snihss?'NIHSS à la sortie : '+ind(e.snihss):''].filter(Boolean).join('\n'));
+  sec('Conclusion',e.concl); sec('Suivi',e.suivi);
+  const rest=(e.todos||[]).filter(x=>!x.done).map(x=>x.x); if(rest.length) sec('Reste à faire',rest.join(' ; '));
+  return L.join('\n').trim(); }
+const H_TRAME="Sur le plan neurologique : \n\nSur le plan extra-neurologique : \n\nSur le plan des facteurs de risque cardiovasculaire : \n\nSur le plan étiologique : \n\nSur le plan thérapeutique : ";
+function hClick(b){
+  const a=b.dataset.ha, re=top=>{ carnetView(); if(top) window.scrollTo(0,0); };
+  if(a==='new'){ hNew(); re(1); return; }
+  if(a==='open'){ hOpen=b.dataset.id; hConfirm=''; nsOpen=false; re(1); return; }
+  const e=hGet(); if(!e) return;
+  const keepY=f=>{ const y=window.scrollY; f(); hSave(); carnetView(); window.scrollTo(0,y); };
+  if(a==='back'){ hOpen=null; hConfirm=''; hAddRoom=false; re(1); return; }
+  if(a==='roomadd'){ const n=document.getElementById('hroom-new'), v=(n&&n.value||'').trim(); if(!v) return; if(!allRooms().includes(v)){ ROOMS.push(v); roomSave(); } hAddRoom=false; keepY(()=>{ e.lit=v; }); return; }
+  if(a==='pick'){ keepY(()=>{ e[b.dataset.k]=e[b.dataset.k]===b.dataset.v?'':b.dataset.v; }); return; }
+  if(a==='st'){ const x=e[b.dataset.l][+b.dataset.i]; if(x.s>=3) return; x.s++; if(x.s===2) x.td=Date.now(); if(x.s===3) x.tf=Date.now(); keepY(()=>{}); return; }
+  if(a==='stback'){ const x=e[b.dataset.l][+b.dataset.i]; if(x.s===3) delete x.tf; if(x.s===2) delete x.td; x.s=Math.max(0,x.s-1); keepY(()=>{}); return; }
+  if(a==='ctins'){ keepY(()=>{ e.evol=(e.evol?e.evol.replace(/\s+$/,'')+'\n':'')+hCtLine(e); }); return; }
+  if(a==='ladd'){ const k=b.dataset.l, inp=document.getElementById('hnew-'+k), v=b.dataset.v||(inp&&inp.value||'').trim(); if(!v) return; keepY(()=>{ (e[k]=e[k]||[]).push({n:v,s:1,r:'',v:2}); }); return; }
+  if(a==='ldel'){ keepY(()=>{ e[b.dataset.l].splice(+b.dataset.i,1); }); return; }
+  if(a==='tadd'){ const q=H_TQ.find(x=>x[0]===b.dataset.v); keepY(()=>{ (e.tt=e.tt||[]).push(q?{n:q[0],d:q[1],p:q[2].slice(),c:''}:{n:'',d:'',p:[0,0,0,0],c:''}); }); if(!q){ const l=app.querySelectorAll('.ttrow input[data-f="n"]'); if(l.length) l[l.length-1].focus(); } return; }
+  if(a==='tp'){ const x=e.tt[+b.dataset.i]; x.p=x.p||[0,0,0,0]; x.p[+b.dataset.j]=x.p[+b.dataset.j]?0:1; b.setAttribute('aria-pressed',!!x.p[+b.dataset.j]); hSave(); return; }
+  if(a==='trame'){ keepY(()=>{ e.evol=hCtLine(e)+'\n\n'+H_TRAME; }); const t=document.getElementById('h-evol'); if(t){ t.focus(); const p=t.value.indexOf('Sur le plan neurologique : ')+27; t.setSelectionRange(p,p); } return; }
+  if(a==='jour'){ const d=new Date(), j=hJ(e), tag=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+(j?' ('+j+')':'')+' : '; keepY(()=>{ e.evol=(e.evol?e.evol.replace(/\s+$/,'')+'\n\n':'')+tag+'\n'+hCtLine(e)+'\n'; }); const t=document.getElementById('h-evol'); if(t){ t.focus(); t.setSelectionRange(t.value.length,t.value.length); } return; }
+  if(a==='ns'){ const i=+b.dataset.i, k=+b.dataset.k; if(!e.ns) e.ns=Array(15).fill(-1); e.ns[i]=e.ns[i]===k?-1:k; nsSync(e); hSave();
+    const w=app.querySelector('.nsit[data-ni="'+i+'"]'); if(w) w.outerHTML=nsItem(e,i).replace(/data-ca=/g,'data-ha='); const sm=document.getElementById('nssum'); if(sm) sm.innerHTML=nsSum(e); return; }
+  if(a==='ns0'){ nsOpen=true; keepY(()=>{ e.ns=Array(15).fill(0); nsSync(e); }); return; }
+  if(a==='nsclr'){ nsOpen=true; keepY(()=>{ delete e.ns; delete e.nsT; delete e.nihss; }); return; }
+  if(a==='todoadd'||a==='todoquick'){ const inp=document.getElementById('htodo-new'), v=a==='todoquick'?b.dataset.v:(inp.value||'').trim(); if(!v) return; keepY(()=>{ (e.todos=e.todos||[]).push({x:v,done:false}); }); return; }
+  if(a==='todotog'){ keepY(()=>{ const x=e.todos[+b.dataset.i]; x.done=!x.done; }); return; }
+  if(a==='tododel'){ keepY(()=>{ e.todos.splice(+b.dataset.i,1); }); return; }
+  if(a==='copy'){ clip(b,hText(e),'hfb'); return; }
+  if(a==='sorti'){ e.sorti=!e.sorti; hSave(); hOpen=null; re(1); return; }
+  if(a==='del'){ hConfirm='del'; keepY(()=>{}); return; }
+  if(a==='cancel'){ hConfirm=''; keepY(()=>{}); return; }
+  if(a==='del2'){ HOSP=HOSP.filter(x=>x.id!==e.id); hSave(); hOpen=null; hConfirm=''; re(1); return; }
+}
+function hInput(el){ const e=hGet(); if(!e) return;
+  if(el.dataset.hk==='lit'){ if(el.value==='__add'){ hAddRoom=true; carnetView(); const n=document.getElementById('hroom-new'); if(n) n.focus(); return; } hAddRoom=false; e.lit=el.value; hSave(); return; }
+  if(el.dataset.hl==='ct'){ (e.ct=e.ct||{})[el.dataset.f]=el.value.trim(); }
+  else if(el.dataset.hl){ const x=(e[el.dataset.hl]||[])[+el.dataset.i]; if(x) x[el.dataset.f]=el.value; }
+  else { e[el.dataset.hk]=el.value; if(el.dataset.hk==='nom'){ const h=app.querySelector('.tool-head h1'); if(h) h.textContent=el.value||'Nouveau patient'; } }
+  hSave(); const s=document.getElementById('hsaved'); if(s) s.textContent=cStoreOK?'Enregistré sur cet appareil':'Non enregistré'; }
+function carnetView(){ const h=hOpen&&hGet(); if(h){ hEntry(h); return; } hOpen=null; const e=cGet(); if(e) carnetEntry(e); else { cOpen=null; carnetList(); } }
 function carnetClick(b){
   const a=b.dataset.ca, e=cGet(), re=(top)=>{ carnetView(); if(top) window.scrollTo(0,0); };
-  if(a==='new'){ cNew(); re(1); return; }
-  if(a==='open'){ cOpen=b.dataset.id; cConfirm=''; re(1); return; }
+  if(a==='new'){ cNew(); hOpen=null; nsOpen=false; re(1); return; }
+  if(a==='open'){ cOpen=b.dataset.id; cConfirm=''; nsOpen=false; re(1); return; }
   if(a==='back'){ cOpen=null; cConfirm=''; re(1); return; }
   if(a==='filter'){ cFilter=b.dataset.v; re(); return; }
   if(a==='qtog'){ const x=CARNET.find(q=>q.id===b.dataset.id); if(x){ const y=window.scrollY; x[b.dataset.k]=!x[b.dataset.k]; cSave(); carnetView(); window.scrollTo(0,y); } return; }
@@ -1477,6 +1909,11 @@ function carnetClick(b){
   if(a==='rvclear'){ keepY(()=>{ delete e.rv; }); return; }
   if(a==='tnow'){ keepY(()=>{ e[b.dataset.k]=Date.now(); if(b.dataset.k==='t0'){ onset=e.t0; saveOnset(); } }); return; }
   if(a==='dec'){ keepY(()=>{ e.dec=e.dec===b.dataset.v?'':b.dataset.v; }); return; }
+  if(a==='ns'){ const i=+b.dataset.i, k=+b.dataset.k; if(!e.ns) e.ns=Array(15).fill(-1); e.ns[i]=e.ns[i]===k?-1:k; nsSync(e); cSave();
+    const w=app.querySelector('.nsit[data-ni="'+i+'"]'); if(w) w.outerHTML=nsItem(e,i); const sm=document.getElementById('nssum'); if(sm) sm.innerHTML=nsSum(e);
+    const ni=document.getElementById('c-nihss'); if(ni&&e.nihss) ni.value=e.nihss; return; }
+  if(a==='ns0'){ nsOpen=true; keepY(()=>{ e.ns=Array(15).fill(0); nsSync(e); }); return; }
+  if(a==='nsclr'){ nsOpen=true; keepY(()=>{ delete e.ns; delete e.nsT; }); return; }
   if(a==='nihssget'){ keepY(()=>{ e.nihss=String(score(TOOLS.find(x=>x.id==='nihss'),S.nihss).tot); }); return; }
   if(a==='survok'){ keepY(()=>{ e.surv=Math.min(SURV_N,(e.surv||0)+1); }); return; }
   if(a==='survundo'){ keepY(()=>{ e.surv=Math.max(0,(e.surv||0)-1); }); return; }
@@ -1529,15 +1966,20 @@ function calcUpdate(t){
   if(out){ out.hidden=!(r&&r.html); out.innerHTML=r&&r.html||''; }
   document.getElementById('bar').innerHTML=r?bar(r.v,esc(r.t||''),r.lvl,true,true):bar('–','Renseigne les valeurs','',false);
 }
-function current(){ return TOOLS.find(t=>t.id===location.hash.slice(1)); }
+function current(){ const id=location.hash.slice(1)||'carnet'; return id==='outils'?null:TOOLS.find(t=>t.id===id)||TOOLS.find(t=>t.id==='carnet'); }
 let homeY=0, onHome=false;
 let lastId='';
 function render(){ const t=current(); fromId=lastId; lastId=t?t.id:''; if(t){ if(onHome) homeY=window.scrollY; tool(t); window.scrollTo(0,0); } else { home(); const y=homeY; window.scrollTo(0,y); requestAnimationFrame(()=>window.scrollTo(0,y)); } onHome=!t; }
 
 app.addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b) return; const t=current(), act=b.dataset.act;
+  if(b.dataset.ha){ hClick(b); return; }
   if(b.dataset.ca){ carnetClick(b); return; }
   const tgo=()=>{ treeView(); const c=document.getElementById('tcur'); if(c&&TP.length) c.scrollIntoView({block:'start'}); else window.scrollTo(0,0); };
+  if(b.dataset.gd!==undefined){ gSheet(+b.dataset.gd); return; }
+  if(b.dataset.gx){ const sh=document.getElementById('gsheet'); if(sh) sh.hidden=true; return; }
+  if(b.dataset.gz!==undefined){ const z=+b.dataset.gz, c=document.getElementById('gin'); if(!c) return; if(z===0){ gZoom=0; gFit(false); return; } const w=document.getElementById('gwrap'), cx=(w.scrollLeft+w.clientWidth/2)/gZoom, cy=(w.scrollTop+w.clientHeight/2)/gZoom;
+    gZoom=Math.min(1.6,Math.max(.35,Math.round((gZoom+z*.15)*100)/100)); c.style.zoom=gZoom; w.scrollLeft=cx*gZoom-w.clientWidth/2; w.scrollTop=cy*gZoom-w.clientHeight/2; document.getElementById('gzv').textContent=Math.round(gZoom*100)+' %'; return; }
   if(b.dataset.tm){ treeMode=b.dataset.tm; treeView(); window.scrollTo(0,0); return; }
   if(b.dataset.ft){ ftKey=b.dataset.ft; treeView(); window.scrollTo(0,0); return; }
   if(b.dataset.to!==undefined){ TP.push({id:treeCur(TP),i:+b.dataset.to}); tgo(); return; }
@@ -1577,6 +2019,7 @@ app.addEventListener('click',e=>{
 });
 app.addEventListener('input',e=>{
   const el=e.target, t=current();
+  if(el.dataset.hk||el.dataset.hl){ hInput(el); return; }
   if(el.dataset.ck){ carnetInput(el); return; }
   if(el.dataset.an){ ANNU[+el.dataset.i][el.dataset.an]=el.value; aSave(); return; }
   if(el.id==='q'){ q=el.value; document.getElementById('list').innerHTML=listHTML(); return; }
@@ -1585,6 +2028,7 @@ app.addEventListener('input',e=>{
   if(t&&el.dataset.f){ const v=V[t.id]; v[el.dataset.f+'_raw']=el.value; v[el.dataset.f]=parseFloat(String(el.value).replace(',','.')); calcUpdate(t); }
 });
 app.addEventListener('change',e=>{
+  if(e.target.dataset.hk||e.target.dataset.hl){ hInput(e.target); return; }
   if(e.target.dataset.ck){ carnetInput(e.target); return; }
   if(e.target.dataset.ff){ F[e.target.dataset.ff]=e.target.value.trim(); formUpdate(); return; }
   if(e.target.id!=='onset'||!e.target.value) return;
@@ -1592,12 +2036,14 @@ app.addEventListener('change',e=>{
   if(d.getTime()>Date.now()+6e4) d.setDate(d.getDate()-1);
   onset=d.getTime(); saveOnset(); document.getElementById('chrono').innerHTML=chronoHTML();
 });
-app.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.id==='todo-new'){ e.preventDefault(); const b=app.querySelector('[data-ca=todoadd]'); if(b) carnetClick(b); const n=document.getElementById('todo-new'); if(n) n.focus(); } });
+app.addEventListener('toggle',ev=>{ const d=ev.target; if(d.classList&&d.classList.contains('nsbox')) nsOpen=d.open; },true);
+app.addEventListener('keydown',e=>{ const hm=e.target.id&&e.target.id.match(/^hnew-(\w+)$|^htodo-new$/); if(e.key==='Enter'&&hm){ e.preventDefault(); const b=app.querySelector(e.target.id==='htodo-new'?'[data-ha=todoadd]':'[data-ha=ladd][data-l="'+hm[1]+'"]:not([data-v])'); if(b) hClick(b); const n=document.getElementById(e.target.id); if(n) n.focus(); return; }
+  if(e.key==='Enter'&&e.target.id==='todo-new'){ e.preventDefault(); const b=app.querySelector('[data-ca=todoadd]'); if(b) carnetClick(b); const n=document.getElementById('todo-new'); if(n) n.focus(); } });
 window.addEventListener('hashchange',render);
 setInterval(()=>{ const sv=document.getElementById('csurv'), ce=cGet(); if(sv&&ce&&ce.tb) sv.innerHTML=survHTML(ce);
   const c=document.getElementById('chrono'); if(c&&onset&&document.activeElement.id!=='onset') c.innerHTML=chronoHTML(); },30000);
 render();
-try{ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&!/claude\.ai|claudeusercontent/.test(location.hostname)) navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){}
+try{ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&!/claude\.ai|claudeusercontent/.test(location.hostname)) navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{}); }catch(e){}
 </script>
 </body>
 </html>
